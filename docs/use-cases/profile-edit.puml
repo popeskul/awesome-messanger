@@ -1,0 +1,41 @@
+@startuml
+actor User
+participant "Client Application" as ClientApp
+participant "API Gateway" as APIGW
+participant "Auth Service" as AuthSvc
+participant "Profile Service" as ProfileSvc
+database "Profile DB" as ProfileDB
+participant "Message Queue (Kafka/RabbitMQ)" as Kafka
+
+User -> ClientApp: Open profile editing form
+User -> ClientApp: Enter new profile data (nickname, bio, avatar)
+User -> ClientApp: Click "Save changes" button
+ClientApp -> APIGW: PUT /profile (auth token, new profile data)
+
+APIGW -> AuthSvc: Verify auth token
+AuthSvc -> APIGW: Auth token is valid
+
+APIGW -> ProfileSvc: PUT /profile (new profile data)
+ProfileSvc -> ProfileDB: Update profile data
+ProfileDB --> ProfileSvc: Confirmation of update
+
+ProfileSvc -> Kafka: Publish profile update event
+
+ProfileSvc -> APIGW: Confirmation of profile update
+APIGW -> ClientApp: Confirmation of profile update
+ClientApp -> User: Display profile update success message
+
+alt Nickname already in use
+    ProfileSvc -> ProfileDB: Check nickname uniqueness
+    ProfileDB --> ProfileSvc: Nickname already in use
+    ProfileSvc -> APIGW: Error: Nickname already in use
+    APIGW -> ClientApp: Error: Nickname already in use
+    ClientApp -> User: Display error message
+end
+
+alt Invalid auth token
+    AuthSvc -> APIGW: Error: Invalid auth token
+    APIGW -> ClientApp: Error: Invalid auth token
+    ClientApp -> User: Display error message
+end
+@enduml

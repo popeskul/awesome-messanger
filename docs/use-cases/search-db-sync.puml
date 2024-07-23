@@ -1,0 +1,26 @@
+@startuml
+actor User
+participant "Client Application" as ClientApp
+participant "API Gateway" as APIGW
+participant "Auth Service" as AuthSvc
+participant "Profile Service" as ProfileSvc
+participant "Search Service" as SearchSvc
+participant "Message Queue (Kafka/RabbitMQ)" as MsgQueue
+database "Auth DB (PostgreSQL)" as AuthDB
+database "Profile DB (PostgreSQL)" as ProfileDB
+database "Search DB (PostgreSQL)" as SearchDB
+
+User -> ClientApp: Register or update profile
+ClientApp -> APIGW: POST /register (or PUT /profile)
+APIGW -> AuthSvc: POST /register (email, password)
+AuthSvc -> AuthDB: Save user data
+AuthSvc -> MsgQueue: Publish "UserCreated" or "UserProfileUpdated" event
+
+MsgQueue -> ProfileSvc: Consume "UserCreated" or "UserProfileUpdated" event
+ProfileSvc -> ProfileDB: Save profile data
+ProfileSvc -> MsgQueue: Publish "UserProfileUpdated" event
+
+MsgQueue -> SearchSvc: Consume "UserProfileUpdated" event
+SearchSvc -> SearchDB: Update user data in Search DB
+
+@enduml
