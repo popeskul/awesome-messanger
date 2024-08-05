@@ -1,0 +1,17 @@
+@startuml
+actor User
+participant "Client Application" as ClientApp
+participant "API Gateway" as APIGW
+participant "Search Service" as SearchSvc
+database "Search DB (PostgreSQL)" as SearchDB
+
+User -> ClientApp: Enter nickname for search
+User -> ClientApp: Click "Search" button
+ClientApp -> APIGW: GET /search?nickname=<nickname>
+APIGW -> SearchSvc: GET /search?nickname=<nickname>
+SearchSvc -> SearchDB: Search users by nickname
+SearchDB --> SearchSvc: Search results
+SearchSvc -> APIGW: Search results
+APIGW -> ClientApp: Search results
+ClientApp -> User: Display search results
+@enduml

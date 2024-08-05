@@ -1,0 +1,16 @@
+@startuml
+actor User
+participant "Client Application" as ClientApp
+participant "API Gateway" as APIGW
+participant "Friend Service" as FriendSvc
+database "Friend DB (PostgreSQL)" as FriendDB
+
+User -> ClientApp: Request friend list
+ClientApp -> APIGW: GET /friends
+APIGW -> FriendSvc: GET /friends
+FriendSvc -> FriendDB: Retrieve friend list
+FriendDB --> FriendSvc: Friend list
+FriendSvc -> APIGW: Friend list
+APIGW -> ClientApp: Friend list
+ClientApp -> User: Display friend list
+@enduml

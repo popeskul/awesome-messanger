@@ -1,0 +1,17 @@
+@startuml
+actor User
+participant "Client Application" as ClientApp
+participant "API Gateway" as APIGW
+participant "Friend Service" as FriendSvc
+database "Friend DB (PostgreSQL)" as FriendDB
+participant "Message Queue (Kafka/RabbitMQ)" as MsgQueue
+participant "Notification Service" as NotifSvc
+
+User -> ClientApp: Send friend request response
+ClientApp -> APIGW: POST /respond-friend-request (friend_id, response)
+APIGW -> FriendSvc: POST /respond-friend-request (friend_id, response)
+FriendSvc -> FriendDB: Update friend request status
+FriendSvc -> MsgQueue: Publish "FriendRequestResponded" event
+MsgQueue -> NotifSvc: Consume "FriendRequestResponded" event
+NotifSvc -> User: Send notification to user
+@enduml

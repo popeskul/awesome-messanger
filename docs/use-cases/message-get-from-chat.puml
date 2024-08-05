@@ -1,0 +1,16 @@
+@startuml
+actor User
+participant "Client Application" as ClientApp
+participant "API Gateway" as APIGW
+participant "Message Service" as MsgSvc
+database "Messages DB (Cassandra/Scylla)" as MsgDB
+
+User -> ClientApp: Open chat with user
+ClientApp -> APIGW: GET /get-messages?chat_id=<chat_id>
+APIGW -> MsgSvc: GET /get-messages?chat_id=<chat_id>
+MsgSvc -> MsgDB: Request messages for chat_id
+MsgDB --> MsgSvc: List of messages
+MsgSvc -> APIGW: List of messages
+APIGW -> ClientApp: List of messages
+ClientApp -> User: Display messages
+@enduml
