@@ -1,0 +1,72 @@
+version: '3.9'
+
+services:
+  auth-service:
+    build:
+      context: ./services/auth
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_ADDRESS=0.0.0.0:8080
+    networks:
+      - awesome-messenger
+
+  profile-service:
+    build:
+      context: ./services/profile
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - SERVER_ADDRESS=0.0.0.0:8082
+    networks:
+      - awesome-messenger
+
+  friend-service:
+    build:
+      context: ./services/friend
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      - SERVER_ADDRESS=0.0.0.0:8083
+    networks:
+      - awesome-messenger
+
+  message-service:
+    build:
+      context: ./services/message
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVER_ADDRESS=0.0.0.0:8081
+    networks:
+      - awesome-messenger
+
+  notification-service:
+    build:
+      context: ./services/notification
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      - SERVER_ADDRESS=0.0.0.0:8084
+    networks:
+      - awesome-messenger
+
+  search-service:
+    build:
+      context: ./services/search
+      dockerfile: Dockerfile
+    ports:
+      - "8085:8085"
+    environment:
+      - SERVER_ADDRESS=0.0.0.0:8085
+    networks:
+      - awesome-messenger
+
+networks:
+  awesome-messenger:
+    driver: bridge

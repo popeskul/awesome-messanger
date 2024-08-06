@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: auth-service
+spec:
+  hosts:
+    - auth-service
+  http:
+    - route:
+        - destination:
+            host: auth-service
+            subset: stable
+          weight: 90
+        - destination:
+            host: auth-service
+            subset: canary
+          weight: 10

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: profile-service-canary
+  labels:
+    app: profile-service
+    version: canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: profile-service
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: profile-service
+        version: canary
+    spec:
+      containers:
+        - name: profile-service
+          image: profile-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SERVER_ADDRESS
+              value: "0.0.0.0:8080"
