@@ -26,11 +26,6 @@ eval $(minikube docker-env)
 ```
 
 ### Building and Deploying Services
-Each service has its own Makefile that automates the build and deployment process. Below are the steps to build and deploy each service.
-
-## Services
-### Auth Service
-
 Build and deploy using the following commands:
 
 ```sh
@@ -39,4 +34,16 @@ make
 make build
 make deploy-blue-green
 make deploy-canary
+```
+
+### Requests
+
+Send a request to the service using the following command:
+    
+```sh
+grpcurl -v -plaintext -d '{}' localhost:50051 grpc.health.v1.Health/Check
+grpcurl -v -plaintext -d '{"username": "user123", "password": "password123"}' localhost:50051 auth.AuthService/Login
+grpcurl -v -plaintext -d '{"token": "your_token_here"}' localhost:50051 auth.AuthService/Logout
+grpcurl -v -plaintext -d '{"username": "newuser", "password": "newpassword"}' localhost:50051 auth.AuthService/Register
+grpcurl -v -plaintext -d '{"old_token": "your_old_token_here"}' localhost:50051 auth.AuthService/Refresh
 ```

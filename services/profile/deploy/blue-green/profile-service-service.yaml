@@ -5,8 +5,8 @@ metadata:
 spec:
   selector:
     app: profile-service
-    version: green # Change to blue to switch
+    version: green
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 8080
+      port: 50054
+      targetPort: 50054

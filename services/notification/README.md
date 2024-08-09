@@ -16,20 +16,10 @@ This repository contains multiple microservices, each with its own Dockerfile an
 minikube start
 ```
 
-### Building Docker Images
-
-Setting Docker Environment to Minikube
-Before building the Docker images, set the Docker environment to Minikube:
-
-```sh
-eval $(minikube docker-env)
-```
-
 ### Building and Deploying Services
 Each service has its own Makefile that automates the build and deployment process. Below are the steps to build and deploy each service.
 
-## Services
-### Auth Service
+### Notification Service
 
 Build and deploy using the following commands:
 
@@ -39,4 +29,13 @@ make
 make build
 make deploy-blue-green
 make deploy-canary
+```
+
+### Requests
+
+Send a request to the service using the following command:
+
+```sh
+grpcurl -v -plaintext -d '{}' localhost:50053 grpc.health.v1.Health/Chec
+grpcurl -v -plaintext -d '{"recipient_id": "user123", "message": "You have a new notification!"}' localhost:50053 message.NotificationService/SendNotification
 ```

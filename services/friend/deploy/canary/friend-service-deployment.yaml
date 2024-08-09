@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: friend-service
+  labels:
+    app: friend-service
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: friend-service
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: friend-service
+        version: canary
+    spec:
+      containers:
+        - name: friend-service
+          image: friend-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SERVER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: friend-service-config
+                  key: SERVER_ADDRESS

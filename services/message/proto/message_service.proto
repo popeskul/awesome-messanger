@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package message;
+
+option go_package = "github.com/popeskul/awesome-messanger/services/message/proto";
+
+service MessageService {
+  rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse);
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+}
+
+message GetMessagesRequest {
+  string chat_id = 1;
+}
+
+message GetMessagesResponse {
+  repeated Message messages = 1;
+}
+
+message SendMessageRequest {
+  string sender_id = 1;
+  string recipient_id = 2;
+  string content = 3;
+}
+
+message SendMessageResponse {
+  bool success = 1;
+}
+
+message Message {
+  string sender_id = 1;
+  string content = 2;
+  int64 timestamp = 3;
+}

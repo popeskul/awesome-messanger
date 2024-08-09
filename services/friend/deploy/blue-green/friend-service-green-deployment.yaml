@@ -25,4 +25,7 @@ spec:
             - containerPort: 8080
           env:
             - name: SERVER_ADDRESS
-              value: "0.0.0.0:8080"
+              valueFrom:
+                configMapKeyRef:
+                  name: friend-service-config
+                  key: SERVER_ADDRESS

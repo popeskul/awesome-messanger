@@ -9,17 +9,21 @@ spec:
   selector:
     matchLabels:
       app: message-service
+      version: canary
   template:
     metadata:
       labels:
         app: message-service
+        version: canary
     spec:
       containers:
         - name: message-service
           image: message-service:latest
-          imagePullPolicy: Never
           ports:
-            - containerPort: 8080
+            - containerPort: 50052
           env:
             - name: SERVER_ADDRESS
-              value: "0.0.0.0:8080"
+              valueFrom:
+                configMapKeyRef:
+                  name: message-service-config
+                  key: SERVER_ADDRESS

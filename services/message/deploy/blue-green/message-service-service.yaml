@@ -5,8 +5,8 @@ metadata:
 spec:
   selector:
     app: message-service
-    version: green # Change to blue to switch
+    version: green
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 8080
+      port: 50052
+      targetPort: 50052

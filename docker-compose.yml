@@ -6,9 +6,9 @@ services:
       context: ./services/auth
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "50051:50051"
     environment:
-      - SERVER_ADDRESS=0.0.0.0:8080
+      - SERVER_ADDRESS=0.0.0.0:50051
     networks:
       - awesome-messenger
 
@@ -17,9 +17,9 @@ services:
       context: ./services/profile
       dockerfile: Dockerfile
     ports:
-      - "8082:8082"
+      - "50054:50054"
     environment:
-      - SERVER_ADDRESS=0.0.0.0:8082
+      - SERVER_ADDRESS=0.0.0.0:50054
     networks:
       - awesome-messenger
 
@@ -28,9 +28,9 @@ services:
       context: ./services/friend
       dockerfile: Dockerfile
     ports:
-      - "8083:8083"
+      - "8080:8080"
     environment:
-      - SERVER_ADDRESS=0.0.0.0:8083
+      - SERVER_ADDRESS=0.0.0.0:8080
     networks:
       - awesome-messenger
 
@@ -39,9 +39,9 @@ services:
       context: ./services/message
       dockerfile: Dockerfile
     ports:
-      - "8081:8081"
+      - "50052:50052"
     environment:
-      - SERVER_ADDRESS=0.0.0.0:8081
+      - SERVER_ADDRESS=0.0.0.0:50052
     networks:
       - awesome-messenger
 
@@ -50,9 +50,9 @@ services:
       context: ./services/notification
       dockerfile: Dockerfile
     ports:
-      - "8084:8084"
+      - "50053:50053"
     environment:
-      - SERVER_ADDRESS=0.0.0.0:8084
+      - SERVER_ADDRESS=0.0.0.0:50053
     networks:
       - awesome-messenger
 
@@ -61,9 +61,9 @@ services:
       context: ./services/search
       dockerfile: Dockerfile
     ports:
-      - "8085:8085"
+      - "8081:8081"
     environment:
-      - SERVER_ADDRESS=0.0.0.0:8085
+      - SERVER_ADDRESS=0.0.0.0:8081
     networks:
       - awesome-messenger
 

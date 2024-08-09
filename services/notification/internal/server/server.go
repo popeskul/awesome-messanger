@@ -1,38 +1,42 @@
 package server
 
 import (
-	"net/http"
+	"log"
+	"net"
 
-	"github.com/popeskul/awesome-messanger/services/notification/internal/config"
-	"github.com/popeskul/awesome-messanger/services/notification/internal/handlers"
+	"github.com/popeskul/awesome-messanger/services/notification/pb/proto"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/reflection"
 )
 
-// Server struct holds server configuration and routes
 type Server struct {
-	httpServer *http.Server
-	handler    *handlers.Handler
+	grpcServer *grpc.Server
 }
 
-// NewServer creates a new Server instance
-func NewServer(cfg *config.Config) *Server {
-	mux := http.NewServeMux()
-	h := handlers.NewHandler()
+func NewServer(notificationServiceServer proto.NotificationServiceServer) *Server {
+	grpcServer := grpc.NewServer()
+	proto.RegisterNotificationServiceServer(grpcServer, notificationServiceServer)
 
-	// Register handlers
-	mux.HandleFunc("/notify", h.NotifyHandler)
-	mux.HandleFunc("/live", h.LivenessHandler)
-	mux.HandleFunc("/ready", h.ReadinessHandler)
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(grpcServer, healthServer)
+	healthServer.SetServingStatus("notification.NotificationService", grpc_health_v1.HealthCheckResponse_SERVING)
+
+	// Register reflection service on gRPC server.
+	reflection.Register(grpcServer)
 
 	return &Server{
-		httpServer: &http.Server{
-			Addr:    cfg.ServerAddress,
-			Handler: mux,
-		},
-		handler: h,
+		grpcServer: grpcServer,
 	}
 }
 
-// ListenAndServe starts the HTTP server
-func (s *Server) ListenAndServe() error {
-	return s.httpServer.ListenAndServe()
+func (s *Server) ListenAndServe(address string) error {
+	listener, err := net.Listen("tcp", address)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Starting gRPC server on %s", address)
+	return s.grpcServer.Serve(listener)
 }

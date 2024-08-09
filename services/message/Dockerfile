@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o /app/message-service ./cmd/main.go
+RUN go build -o /app/message-service ./cmd/server/main.go
 
 # Start a new stage from scratch
 FROM scratch
@@ -22,8 +22,8 @@ FROM scratch
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/message-service /app/message-service
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Expose port 50051 to the outside world
+EXPOSE 50052
 
 # Command to run the executable
 ENTRYPOINT ["/app/message-service"]

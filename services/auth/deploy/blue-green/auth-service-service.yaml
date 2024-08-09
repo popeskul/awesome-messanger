@@ -8,5 +8,5 @@ spec:
     version: green
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 8080
+      port: 50051
+      targetPort: 50051

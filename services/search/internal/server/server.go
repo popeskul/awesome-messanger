@@ -1,37 +1,33 @@
 package server
 
 import (
-	"github.com/popeskul/awesome-messanger/services/search/internal/config"
-	"github.com/popeskul/awesome-messanger/services/search/internal/handlers"
+	"log"
 	"net/http"
+
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/popeskul/awesome-messanger/services/search/internal/config"
 )
 
-// Server struct holds server configuration and routes
 type Server struct {
-	httpServer *http.Server
-	handler    *handlers.Handler
+	cfg *config.Config
 }
 
-// NewServer creates a new Server instance
-func NewServer(cfg *config.Config) *Server {
-	mux := http.NewServeMux()
-	h := handlers.NewHandler()
+func NewServer(cfg *config.Config, executableSchema graphql.ExecutableSchema) *Server {
+	srv := handler.NewDefaultServer(executableSchema)
 
-	// Register handlers
-	mux.HandleFunc("/search", h.SearchHandler)
-	mux.HandleFunc("/live", h.LivenessHandler)
-	mux.HandleFunc("/ready", h.ReadinessHandler)
+	http.Handle("/graphql", srv)
+	http.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
 
 	return &Server{
-		httpServer: &http.Server{
-			Addr:    cfg.ServerAddress,
-			Handler: mux,
-		},
-		handler: h,
+		cfg: cfg,
 	}
 }
 
-// ListenAndServe starts the HTTP server
-func (s *Server) ListenAndServe() error {
-	return s.httpServer.ListenAndServe()
+func (s *Server) Start() {
+	log.Printf("connect to http://localhost%s/ for GraphQL playground", s.cfg.ServerAddress)
+	if err := http.ListenAndServe(s.cfg.ServerAddress, nil); err != nil {
+		log.Fatalf("could not start server: %v", err)
+	}
 }

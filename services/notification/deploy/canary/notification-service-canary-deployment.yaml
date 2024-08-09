@@ -20,9 +20,11 @@ spec:
       containers:
         - name: notification-service
           image: notification-service:latest
-          imagePullPolicy: Never
           ports:
-            - containerPort: 8080
+            - containerPort: 50053
           env:
             - name: SERVER_ADDRESS
-              value: "0.0.0.0:8080"
+              valueFrom:
+                configMapKeyRef:
+                  name: notification-service-config
+                  key: SERVER_ADDRESS

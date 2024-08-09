@@ -1,0 +1,13 @@
+type Query {
+    search(nickname: String!): [User]!
+}
+
+type Mutation {
+    exampleMutation(input: String!): String!
+}
+
+type User {
+    id: ID!
+    nickname: String!
+    description: String!
+}

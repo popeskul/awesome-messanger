@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package message;
+
+option go_package = "github.com/popeskul/awesome-messanger/services/profile/proto";
+
+service ProfileService {
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+}
+
+message UpdateProfileRequest {
+  string user_id = 1;
+  string nickname = 2;
+  string bio = 3;
+  string avatar_url = 4;
+}
+
+message UpdateProfileResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetProfileRequest {
+  string user_id = 1;
+}
+
+message GetProfileResponse {
+  string user_id = 1;
+  string nickname = 2;
+  string bio = 3;
+  string avatar_url = 4;
+}

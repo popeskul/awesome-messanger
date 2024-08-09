@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o /app/friend-service ./cmd/main.go
+RUN go build -o /app/friend-service ./cmd/server/main.go
 
 # Start a new stage from scratch
 FROM scratch
@@ -23,7 +23,7 @@ FROM scratch
 COPY --from=builder /app/friend-service /app/friend-service
 
 # Expose port 8080 to the outside world
-EXPOSE 8084
+EXPOSE 8080
 
 # Command to run the executable
 ENTRYPOINT ["/app/friend-service"]

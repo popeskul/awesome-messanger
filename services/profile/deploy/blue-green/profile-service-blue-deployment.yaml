@@ -22,7 +22,10 @@ spec:
           image: profile-service:latest
           imagePullPolicy: Never
           ports:
-            - containerPort: 8080
+            - containerPort: 50054
           env:
             - name: SERVER_ADDRESS
-              value: "0.0.0.0:8080"
+              valueFrom:
+                configMapKeyRef:
+                  name: profile-service-config
+                  key: SERVER_ADDRESS
