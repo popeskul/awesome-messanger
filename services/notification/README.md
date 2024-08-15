@@ -36,6 +36,6 @@ make deploy-canary
 Send a request to the service using the following command:
 
 ```sh
-grpcurl -v -plaintext -d '{}' localhost:50053 grpc.health.v1.Health/Chec
-grpcurl -v -plaintext -d '{"recipient_id": "user123", "message": "You have a new notification!"}' localhost:50053 message.NotificationService/SendNotification
+grpcurl -v -plaintext -d '{}' localhost:50070 grpc.health.v1.Health/Chec
+grpcurl -v -plaintext -d '{"recipient_id": "user123", "message": "You have a new notification!"}' localhost:50070 message.NotificationService/SendNotification
 ```

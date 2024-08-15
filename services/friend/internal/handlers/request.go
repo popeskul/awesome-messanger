@@ -2,25 +2,32 @@ package handlers
 
 import "github.com/popeskul/awesome-messanger/services/friend/internal/models"
 
-type PostRespondFriendRequestJSONRequestBody struct {
-	FriendId string `json:"friend_id"`
-	Response string `json:"response"`
+type FriendRequest struct {
+	UserId   string `json:"userId" validate:"required"`
+	FriendId string `json:"friendId" validate:"required"`
 }
 
-func (r *PostRespondFriendRequestJSONRequestBody) ConvertToModel() *models.Friend {
+type Friend struct {
+	UserId   string `json:"userId"`
+	FriendId string `json:"friendId"`
+}
+
+type PostRespondFriendRequestJSONRequestBody struct {
+	UserId   string `json:"userId" validate:"required"`
+	FriendId string `json:"friendId" validate:"required"`
+	Accept   bool   `json:"accept" validate:"required"`
+}
+
+func (f FriendRequest) ConvertToModel() *models.Friend {
 	return &models.Friend{
-		FriendId: r.FriendId,
+		UserId:   f.UserId,
+		FriendId: f.FriendId,
 	}
 }
 
-type FriendRequest struct {
-	UserId   string `json:"user_id" validate:"required"`
-	FriendId string `json:"friend_id" validate:"required"`
-}
-
-func (r *FriendRequest) ConvertToModel() *models.Friend {
+func (f PostRespondFriendRequestJSONRequestBody) ConvertToModel() *models.Friend {
 	return &models.Friend{
-		UserId:   r.UserId,
-		FriendId: r.FriendId,
+		UserId:   f.UserId,
+		FriendId: f.FriendId,
 	}
 }

@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package message;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/popeskul/awesome-messanger/services/notification/pkg/api/notification;notification";
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "NotificationService API"
+    version: "1.0.0"
+    description: "This is the API for notification services."
+    contact: {name: "Notification gRPC-Gateway project"}
+  }
+  external_docs: {
+    url: "https://github.com/grpc-ecosystem/grpc-gateway"
+    description: "Find out more about gRPC-Gateway"
+  }
+  schemes: [
+    HTTP,
+    HTTPS
+  ]
+};
+
+// NotificationService provides methods for sending notifications.
+service NotificationService {
+  // SendNotification sends a notification to a specified recipient.
+  rpc SendNotification(SendNotificationRequest) returns (SendNotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications"
+      body: "*"
+    };
+  }
+}
+
+// SendNotificationRequest is the request message for sending a notification.
+message SendNotificationRequest {
+  // recipient_id is the ID of the recipient.
+  string recipient_id = 1 [
+    json_name = "recipient_id",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // message is the content of the notification.
+  string message = 2 [
+    json_name = "message",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// SendNotificationResponse is the response message for sending a notification.
+message SendNotificationResponse {
+  // success indicates whether the notification was successfully sent.
+  bool success = 1 [json_name = "success"];
+}

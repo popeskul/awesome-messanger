@@ -6,7 +6,7 @@ metadata:
     app: notification-service
     version: canary
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: notification-service
@@ -21,10 +21,16 @@ spec:
         - name: notification-service
           image: notification-service:latest
           ports:
-            - containerPort: 50053
+            - containerPort: 50070
+            - containerPort: 9010
           env:
-            - name: SERVER_ADDRESS
+            - name: SERVER_HTTP_ADDRESS
               valueFrom:
                 configMapKeyRef:
                   name: notification-service-config
-                  key: SERVER_ADDRESS
+                  key: SERVER_HTTP_ADDRESS
+            - name: SERVER_GRPC_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: notification-service-config
+                  key: SERVER_GRPC_ADDRESS

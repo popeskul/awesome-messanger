@@ -15,4 +15,4 @@ spec:
               service:
                 name: notification-service
                 port:
-                  number: 50053
+                  number: 9010

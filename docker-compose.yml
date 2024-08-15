@@ -6,20 +6,13 @@ services:
       context: ./services/auth
       dockerfile: Dockerfile
     ports:
-      - "50051:50051"
+      - "50050:50050"
+      - "8080:8080"
+      - "8081:8081"
     environment:
-      - SERVER_ADDRESS=0.0.0.0:50051
-    networks:
-      - awesome-messenger
-
-  profile-service:
-    build:
-      context: ./services/profile
-      dockerfile: Dockerfile
-    ports:
-      - "50054:50054"
-    environment:
-      - SERVER_ADDRESS=0.0.0.0:50054
+      - SERVER_HTTP_ADDRESS=0.0.0.0:8080
+      - SERVER_SWAGGER_ADDRESS=localhost:8081
+      - SERVER_GRPC_ADDRESS=0.0.0.0:50050
     networks:
       - awesome-messenger
 
@@ -28,9 +21,11 @@ services:
       context: ./services/friend
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8090:8090"
+      - "8091:8091"
     environment:
-      - SERVER_ADDRESS=0.0.0.0:8080
+      - SERVER_HTTP_ADDRESS=0.0.0.0:8090
+      - SERVER_SWAGGER_ADDRESS=localhost:8091
     networks:
       - awesome-messenger
 
@@ -39,9 +34,11 @@ services:
       context: ./services/message
       dockerfile: Dockerfile
     ports:
-      - "50052:50052"
+      - "50060:50060"
+      - "9000:9000"
     environment:
-      - SERVER_ADDRESS=0.0.0.0:50052
+      - SERVER_HTTP_ADDRESS=0.0.0.0:9000
+      - SERVER_GRPC_ADDRESS=0.0.0.0:50060
     networks:
       - awesome-messenger
 
@@ -50,9 +47,24 @@ services:
       context: ./services/notification
       dockerfile: Dockerfile
     ports:
-      - "50053:50053"
+      - "50070:50070"
+      - "9010:9010"
     environment:
-      - SERVER_ADDRESS=0.0.0.0:50053
+      - SERVER_HTTP_ADDRESS=0.0.0.0:9010
+      - SERVER_GRPC_ADDRESS=0.0.0.0:50070
+    networks:
+      - awesome-messenger
+
+  profile-service:
+    build:
+      context: ./services/profile
+      dockerfile: Dockerfile
+    ports:
+      - "50080:50080"
+      - "9020:9020"
+    environment:
+      - SERVER_HTTP_ADDRESS=0.0.0.0:9020
+      - SERVER_GRPC_ADDRESS=0.0.0.0:50080
     networks:
       - awesome-messenger
 
@@ -61,9 +73,11 @@ services:
       context: ./services/search
       dockerfile: Dockerfile
     ports:
-      - "8081:8081"
+      - "50090:50090"
+      - "9030:9030"
     environment:
-      - SERVER_ADDRESS=0.0.0.0:8081
+      - SERVER_HTTP_ADDRESS=0.0.0.0:9030
+      - SERVER_GRPC_ADDRESS=0.0.0.0:50090
     networks:
       - awesome-messenger
 

@@ -11,6 +11,7 @@ type Logger interface {
 }
 
 type ProfileServiceI interface {
+	CreateProfile(ctx context.Context, req *model.CreateProfileRequest) (*model.Profile, error)
 	UpdateProfile(ctx context.Context, req *model.UpdateProfileRequest) (*model.Profile, error)
 	GetProfile(ctx context.Context, req *model.GetProfileRequest) (*model.Profile, error)
 }

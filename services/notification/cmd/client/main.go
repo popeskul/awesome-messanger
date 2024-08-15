@@ -5,12 +5,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/popeskul/awesome-messanger/services/notification/pb/proto"
+	"github.com/popeskul/awesome-messanger/services/notification/pkg/api/notification"
 	"google.golang.org/grpc"
 )
 
 const (
-	address = "localhost:50053"
+	address = "localhost:50070"
 )
 
 func main() {
@@ -20,12 +20,12 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := proto.NewNotificationServiceClient(conn)
+	client := notification.NewNotificationServiceClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	resp, err := client.SendNotification(ctx, &proto.SendNotificationRequest{
+	resp, err := client.SendNotification(ctx, &notification.SendNotificationRequest{
 		RecipientId: "user123",
 		Message:     "Hello, this is a test notification!",
 	})

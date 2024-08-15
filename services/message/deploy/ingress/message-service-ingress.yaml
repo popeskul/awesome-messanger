@@ -15,4 +15,4 @@ spec:
               service:
                 name: message-service
                 port:
-                  number: 50052
+                  number: 9000

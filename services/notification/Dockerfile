@@ -22,8 +22,9 @@ FROM scratch
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/notification-service /app/notification-service
 
-# Expose port 50053 to the outside world
-EXPOSE 50053
+# Expose ports for gRPC and HTTP
+EXPOSE 50070
+EXPOSE 9010
 
 # Command to run the executable
 ENTRYPOINT ["/app/notification-service"]

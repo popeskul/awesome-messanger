@@ -30,6 +30,18 @@ func NewHandler(service Service, validator Validator) *Handler {
 	}
 }
 
+// PostAddFriend godoc
+// @Summary Add a friend
+// @Description Add a friend
+// @Tags friends
+// @Accept json
+// @Produce json
+// @Param body body FriendRequest true "Friend request"
+// @Success 201 {string} string "Friend added"
+// @Failure 400 {string} string "Invalid request payload"
+// @Failure 400 {string} string "Validation failed"
+// @Failure 500 {string} string "Failed to add friend"
+// @Router /add-friend [post]
 func (h *Handler) PostAddFriend(w http.ResponseWriter, r *http.Request) {
 	var req FriendRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -51,6 +63,16 @@ func (h *Handler) PostAddFriend(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+// GetFriends godoc
+// @Summary Get friends
+// @Description Get friends
+// @Tags friends
+// @Accept json
+// @Produce json
+// @Param userId query string true "User ID"
+// @Success 200 {array} Friend "Friends"
+// @Failure 500 {string} string "Failed to retrieve friends"
+// @Router /friends [get]
 func (h *Handler) GetFriends(w http.ResponseWriter, r *http.Request) {
 	userId := r.URL.Query().Get("userId")
 
@@ -76,6 +98,18 @@ func (h *Handler) GetFriends(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PostRespondFriendRequest godoc
+// @Summary Respond to a friend request
+// @Description Respond to a friend request
+// @Tags friends
+// @Accept json
+// @Produce json
+// @Param body body PostRespondFriendRequestJSONRequestBody true "Friend request response"
+// @Success 200 {string} string "Friend request responded"
+// @Failure 400 {string} string "Invalid request payload"
+// @Failure 400 {string} string "Validation failed"
+// @Failure 500 {string} string "Failed to respond to friend request"
+// @Router /respond-friend-request [post]
 func (h *Handler) PostRespondFriendRequest(w http.ResponseWriter, r *http.Request) {
 	var req PostRespondFriendRequestJSONRequestBody
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -97,10 +131,22 @@ func (h *Handler) PostRespondFriendRequest(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 }
 
+// GetLive godoc
+// @Summary Get live
+// @Description Get live
+// @Tags health
+// @Success 200 {string} string "OK"
+// @Router /live [get]
 func (h *Handler) GetLive(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// GetReady godoc
+// @Summary Get ready
+// @Description Get ready
+// @Tags health
+// @Success 200 {string} string "OK"
+// @Router /ready [get]
 func (h *Handler) GetReady(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }

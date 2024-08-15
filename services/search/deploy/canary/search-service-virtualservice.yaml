@@ -15,4 +15,5 @@ spec:
             host: search-service
             subset: canary
           weight: 10
-      port: 8081
+      port:
+        number: 9030

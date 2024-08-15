@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Swagger UI</title>
+  <link rel="stylesheet" type="text/css" href="/swagger/swagger-ui.css" />
+  <link rel="stylesheet" type="text/css" href="/swagger/index.css" />
+  <link rel="icon" type="image/png" href="/swagger/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="/swagger/favicon-16x16.png" sizes="16x16" />
+  <style>
+    body { font-family: Arial, sans-serif; }
+    #swagger-ui { margin: 20px; }
+    #api-selector { margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+<div>
+  <select id="api-selector">
+    <option value="/swagger/swagger.swagger.json">API Specification</option>
+  </select>
+</div>
+<div id="swagger-ui"></div>
+<script src="/swagger/swagger-ui-bundle.js" charset="UTF-8"></script>
+<script src="/swagger/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
+<script>
+  function loadSwaggerSpec(url) {
+    window.ui = SwaggerUIBundle({
+      url: url,
+      dom_id: '#swagger-ui',
+      presets: [
+        SwaggerUIBundle.presets.apis,
+        SwaggerUIStandalonePreset
+      ],
+      layout: "StandaloneLayout",
+      requestInterceptor: (request) => {
+        if (request.url.startsWith('/')) {
+          request.url = "{{.APIBaseURL}}" + request.url;
+        }
+        return request;
+      }
+    });
+  }
+
+  loadSwaggerSpec('/swagger/swagger.swagger.json');
+
+  document.getElementById('api-selector').addEventListener('change', function() {
+    loadSwaggerSpec(this.value);
+  });
+</script>
+</body>
+</html>

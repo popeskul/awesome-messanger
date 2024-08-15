@@ -3,4 +3,5 @@ kind: ConfigMap
 metadata:
   name: search-service-config
 data:
-  SERVER_ADDRESS: "0.0.0.0:8081"
+  SERVER_HTTP_ADDRESS: "0.0.0.0:9030"
+  SERVER_GRPC_ADDRESS: "0.0.0.0:50090"

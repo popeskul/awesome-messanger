@@ -5,7 +5,8 @@ import (
 
 	"github.com/popeskul/awesome-messanger/services/message/internal/config"
 	"github.com/popeskul/awesome-messanger/services/message/internal/handlers"
-	"github.com/popeskul/awesome-messanger/services/message/internal/server"
+	"github.com/popeskul/awesome-messanger/services/message/internal/server/grpc"
+	"github.com/popeskul/awesome-messanger/services/message/internal/server/http"
 	"github.com/popeskul/awesome-messanger/services/message/internal/services"
 )
 
@@ -19,12 +20,21 @@ func main() {
 	messageService := services.NewMessageService(logger)
 	service := services.NewService(messageService)
 
-	handler := handlers.NewHandler(service)
+	handler, err := handlers.NewHandler(service)
+	if err != nil {
+		log.Fatalf("Error creating handlers: %v", err)
+	}
 
-	srv := server.NewServer(handler)
-	log.Printf("Starting server on %s", cfg.ServerAddress)
+	grpcServer := grpc.NewGrpcServer(handler)
+	gatewayServer := http.NewGatewayServer(handler)
 
-	if err := srv.ListenAndServe(cfg.ServerAddress); err != nil {
-		log.Fatalf("Server failed: %v", err)
+	go func() {
+		if err := grpcServer.ListenAndServe(cfg.Server.GrpcAddress); err != nil {
+			log.Fatalf("Failed to start gRPC server: %v", err)
+		}
+	}()
+
+	if err := gatewayServer.ListenAndServe(cfg.Server.HttpAddress); err != nil {
+		log.Fatalf("Failed to start HTTP server: %v", err)
 	}
 }

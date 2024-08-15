@@ -33,17 +33,17 @@ make deploy-canary
 Send a request to the service using the following command:
     
 ```sh
-curl -v -X POST "http://localhost:8080/add-friend" \
+curl -v -X POST "http://localhost:8090/add-friend" \
      -H "Content-Type: application/json" \
      -d '{"userId": "user123", "friendId": "friend456"}'
 
-curl -v -X GET "http://localhost:8080/friends?userId=user123"
+curl -v -X GET "http://localhost:8090/friends?userId=user123"
 
-curl -v -X GET "http://localhost:8080/live"
+curl -v -X GET "http://localhost:8090/live"
 
-curl -v -X GET "http://localhost:8080/ready"
+curl -v -X GET "http://localhost:8090/ready"
 
-curl -v -X POST "http://localhost:8080/respond-friend-request" \
+curl -v -X POST "http://localhost:8090/respond-friend-request" \
      -H "Content-Type: application/json" \
      -d '{"friendId": "friend456", "response": "accepted"}'
 ```

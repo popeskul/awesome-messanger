@@ -36,7 +36,9 @@ make deploy-canary
 Send a request to the service using the following command:
     
 ```sh
-grpcurl -v -plaintext -d '{}' localhost:50054 grpc.health.v1.Health/Check
-grpcurl -v -plaintext -d '{"user_id": "123", "nickname": "JohnDoe", "bio": "Developer", "avatar_url": "http://example.com/avatar.jpg"}' localhost:50054 message.ProfileService/UpdateProfile
-grpcurl -v -plaintext -d '{"user_id": "123"}' localhost:50054 message.ProfileService/GetProfile
+curl http://localhost:9020/v1/health
+curl http://localhost:9020/v1/liveness
+curl http://localhost:9020/v1/readiness
+curl http://localhost:9020/v1/healthz
+
 ```

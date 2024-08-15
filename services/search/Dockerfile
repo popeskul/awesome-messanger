@@ -22,8 +22,9 @@ FROM scratch
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/search-service /app/search-service
 
-# Expose port 8081 to the outside world
-EXPOSE 8081
+# Expose ports for gRPC and HTTP
+EXPOSE 50090
+EXPOSE 9030
 
 # Command to run the executable
 ENTRYPOINT ["/app/search-service"]

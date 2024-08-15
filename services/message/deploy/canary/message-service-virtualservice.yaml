@@ -15,4 +15,5 @@ spec:
             host: message-service
             subset: canary
           weight: 10
-      port: 50052
+      port:
+        number: 9000

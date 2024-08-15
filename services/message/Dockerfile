@@ -22,8 +22,9 @@ FROM scratch
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/message-service /app/message-service
 
-# Expose port 50051 to the outside world
-EXPOSE 50052
+# Expose ports for gRPC and HTTP
+EXPOSE 50060
+EXPOSE 9000
 
 # Command to run the executable
 ENTRYPOINT ["/app/message-service"]

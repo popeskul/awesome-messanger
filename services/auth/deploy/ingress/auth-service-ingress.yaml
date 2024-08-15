@@ -9,10 +9,17 @@ spec:
     - host: auth-service.local
       http:
         paths:
-          - path: /
+          - path: /api
             pathType: Prefix
             backend:
               service:
                 name: auth-service
                 port:
-                  number: 50051
+                  number: 8080
+          - path: /swagger
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8081

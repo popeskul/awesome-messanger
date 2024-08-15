@@ -7,6 +7,11 @@ spec:
     app: notification-service
     version: green
   ports:
-    - protocol: TCP
-      port: 50053
-      targetPort: 50053
+    - name: grpc
+      protocol: TCP
+      port: 50070
+      targetPort: 50070
+    - name: http
+      protocol: TCP
+      port: 9010
+      targetPort: 9010

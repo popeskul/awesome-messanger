@@ -22,8 +22,12 @@ FROM scratch
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/friend-service /app/friend-service
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Копируем сгенерированные файлы Swagger
+COPY swagger /app/swagger
+
+# Expose ports for HTTP
+EXPOSE 8090
+EXPOSE 8091
 
 # Command to run the executable
 ENTRYPOINT ["/app/friend-service"]

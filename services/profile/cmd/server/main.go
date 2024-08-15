@@ -4,10 +4,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/popeskul/awesome-messanger/services/profile/internal/config"
 	"github.com/popeskul/awesome-messanger/services/profile/internal/handlers"
-	"github.com/popeskul/awesome-messanger/services/profile/internal/server"
+	"github.com/popeskul/awesome-messanger/services/profile/internal/server/grpc"
+	"github.com/popeskul/awesome-messanger/services/profile/internal/server/http"
 	"github.com/popeskul/awesome-messanger/services/profile/internal/services"
 )
 
@@ -20,14 +20,22 @@ func main() {
 	logger := log.New(os.Stdout, "profile", log.LstdFlags)
 	profileService := services.NewProfileService(logger)
 	service := services.NewService(profileService)
-	validatorService := validator.New()
 
-	handler := handlers.NewHandler(service, validatorService)
+	handler, err := handlers.NewHandler(service)
+	if err != nil {
+		log.Fatalf("Error creating handlers: %v", err)
+	}
 
-	srv := server.NewServer(handler)
-	log.Printf("Starting server on %s", cfg.ServerAddress)
+	grpcServer := grpc.NewGrpcServer(handler)
+	gatewayServer := http.NewGatewayServer(handler)
 
-	if err := srv.ListenAndServe(cfg.ServerAddress); err != nil {
-		log.Fatalf("Error starting server: %v", err)
+	go func() {
+		if err := grpcServer.ListenAndServe(cfg.Server.GrpcAddress); err != nil {
+			log.Fatalf("Failed to start gRPC server: %v", err)
+		}
+	}()
+
+	if err := gatewayServer.ListenAndServe(cfg.Server.HttpAddress); err != nil {
+		log.Fatalf("Failed to start HTTP server: %v", err)
 	}
 }

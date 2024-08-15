@@ -1,8 +1,6 @@
 package models
 
-import (
-	"github.com/popeskul/awesome-messanger/services/message/pb/proto"
-)
+import "github.com/popeskul/awesome-messanger/services/message/pkg/api/message"
 
 type Message struct {
 	SenderId  string
@@ -10,8 +8,8 @@ type Message struct {
 	Timestamp int64
 }
 
-func (m *Message) ConvertToProto() *proto.Message {
-	return &proto.Message{
+func (m *Message) ConvertToProto() *message.Message {
+	return &message.Message{
 		SenderId:  m.SenderId,
 		Content:   m.Content,
 		Timestamp: m.Timestamp,

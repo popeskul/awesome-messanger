@@ -4,7 +4,7 @@ metadata:
   name: profile-service
 spec:
   hosts:
-    - "profile-service"
+    - profile-service
   http:
     - route:
         - destination:
@@ -15,4 +15,5 @@ spec:
             host: profile-service
             subset: canary
           weight: 10
-      port: 50054
+      port:
+        number: 9020

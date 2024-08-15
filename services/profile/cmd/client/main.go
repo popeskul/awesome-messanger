@@ -5,12 +5,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/popeskul/awesome-messanger/services/profile/pb/proto"
+	"github.com/popeskul/awesome-messanger/services/profile/pkg/api/profile"
 	"google.golang.org/grpc"
 )
 
 const (
-	address = "localhost:50054"
+	address = "localhost:50080"
 )
 
 func main() {
@@ -20,30 +20,15 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := proto.NewProfileServiceClient(conn)
+	client := profile.NewProfileServiceClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	updateResp, err := client.UpdateProfile(ctx, &proto.UpdateProfileRequest{
-		UserId:    "123",
-		Nickname:  "new_nickname",
-		Bio:       "This is a new bio.",
-		AvatarUrl: "http://example.com/avatar.jpg",
+	_, err = client.UpdateProfile(ctx, &profile.UpdateProfileRequest{
+		UserId:    "1",
+		Nickname:  "popeskul",
+		Bio:       "I am a software engineer",
+		AvatarUrl: "https://avatars.githubusercontent.com/u/12345678",
 	})
-	if err != nil {
-		log.Fatalf("could not update profile: %v", err)
-	}
-
-	log.Printf("Update Profile Response: Success: %v, Message: %s", updateResp.GetSuccess(), updateResp.GetMessage())
-
-	getResp, err := client.GetProfile(ctx, &proto.GetProfileRequest{
-		UserId: "123",
-	})
-	if err != nil {
-		log.Fatalf("could not get profile: %v", err)
-	}
-
-	log.Printf("Get Profile Response: UserId: %s, Nickname: %s, Bio: %s, AvatarUrl: %s",
-		getResp.GetUserId(), getResp.GetNickname(), getResp.GetBio(), getResp.GetAvatarUrl())
 }

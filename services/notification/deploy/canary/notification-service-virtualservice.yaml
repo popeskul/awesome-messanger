@@ -4,7 +4,7 @@ metadata:
   name: notification-service
 spec:
   hosts:
-    - "notification-service"
+    - notification-service
   http:
     - route:
         - destination:
@@ -15,4 +15,5 @@ spec:
             host: notification-service
             subset: canary
           weight: 10
-      port: 50053
+      port:
+        number: 9010

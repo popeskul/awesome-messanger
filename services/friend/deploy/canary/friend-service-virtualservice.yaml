@@ -15,4 +15,14 @@ spec:
             host: friend-service
             subset: canary
           weight: 10
-      port: 8080
+      port: 8090
+    - route:
+        - destination:
+            host: friend-service
+            subset: stable
+          weight: 90
+        - destination:
+            host: friend-service
+            subset: canary
+          weight: 10
+      port: 8091

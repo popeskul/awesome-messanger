@@ -7,6 +7,11 @@ spec:
     app: search-service
     version: green
   ports:
-    - protocol: TCP
-      port: 8081
-      targetPort: 8081
+    - name: grpc
+      protocol: TCP
+      port: 50090
+      targetPort: 50090
+    - name: http
+      protocol: TCP
+      port: 9030
+      targetPort: 9030

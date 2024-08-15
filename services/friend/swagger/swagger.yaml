@@ -1,0 +1,149 @@
+basePath: /
+definitions:
+  handlers.Friend:
+    properties:
+      friendId:
+        type: string
+      userId:
+        type: string
+    type: object
+  handlers.FriendRequest:
+    properties:
+      friendId:
+        type: string
+      userId:
+        type: string
+    required:
+    - friendId
+    - userId
+    type: object
+  handlers.PostRespondFriendRequestJSONRequestBody:
+    properties:
+      accept:
+        type: boolean
+      friendId:
+        type: string
+      userId:
+        type: string
+    required:
+    - accept
+    - friendId
+    - userId
+    type: object
+host: localhost:8090
+info:
+  contact: {}
+  description: This is a Friend service API
+  title: Friend Service API
+  version: "1.0"
+paths:
+  /add-friend:
+    post:
+      consumes:
+      - application/json
+      description: Add a friend
+      parameters:
+      - description: Friend request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.FriendRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Friend added
+          schema:
+            type: string
+        "400":
+          description: Validation failed
+          schema:
+            type: string
+        "500":
+          description: Failed to add friend
+          schema:
+            type: string
+      summary: Add a friend
+      tags:
+      - friends
+  /friends:
+    get:
+      consumes:
+      - application/json
+      description: Get friends
+      parameters:
+      - description: User ID
+        in: query
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Friends
+          schema:
+            items:
+              $ref: '#/definitions/handlers.Friend'
+            type: array
+        "500":
+          description: Failed to retrieve friends
+          schema:
+            type: string
+      summary: Get friends
+      tags:
+      - friends
+  /live:
+    get:
+      description: Get live
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get live
+      tags:
+      - health
+  /ready:
+    get:
+      description: Get ready
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get ready
+      tags:
+      - health
+  /respond-friend-request:
+    post:
+      consumes:
+      - application/json
+      description: Respond to a friend request
+      parameters:
+      - description: Friend request response
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.PostRespondFriendRequestJSONRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Friend request responded
+          schema:
+            type: string
+        "400":
+          description: Validation failed
+          schema:
+            type: string
+        "500":
+          description: Failed to respond to friend request
+          schema:
+            type: string
+      summary: Respond to a friend request
+      tags:
+      - friends
+swagger: "2.0"
