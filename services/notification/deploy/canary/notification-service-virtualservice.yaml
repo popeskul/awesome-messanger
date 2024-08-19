@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: notification-service
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - notification-service-gateway
+  http:
+    - route:
+        - destination:
+            host: notification-service
+            subset: stable
+          weight: 90
+        - destination:
+            host: notification-service
+            subset: canary
+          weight: 10

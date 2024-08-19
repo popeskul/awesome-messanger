@@ -1,0 +1,18 @@
+@startuml
+actor User
+participant "Client Application" as ClientApp
+participant "API Gateway" as APIGW
+participant "Message Service" as MsgSvc
+database "Messages DB (Cassandra/Scylla)" as MsgDB
+participant "Message Queue (Kafka/RabbitMQ)" as MsgQueue
+participant "Notification Service" as NotifSvc
+
+User -> ClientApp: Enter message and send
+ClientApp -> APIGW: POST /send-message (recipient_id, message)
+APIGW -> MsgSvc: POST /send-message (recipient_id, message)
+MsgSvc -> MsgDB: Save message
+MsgSvc -> MsgQueue: Publish "MessageSent" event
+MsgQueue -> NotifSvc: Consume "MessageSent" event
+NotifSvc -> User: Send notification to recipient
+ClientApp -> User: Display notification of new message
+@enduml

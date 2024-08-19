@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: friend-service-green
+  labels:
+    app: friend-service
+    version: green
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: friend-service
+      version: green
+  template:
+    metadata:
+      labels:
+        app: friend-service
+        version: green
+    spec:
+      containers:
+        - name: friend-service
+          image: friend-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SERVER_ADDRESS
+              value: "0.0.0.0:8080"

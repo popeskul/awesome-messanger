@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-service-canary
+  labels:
+    app: search-service
+    version: canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: search-service
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: search-service
+        version: canary
+    spec:
+      containers:
+        - name: search-service
+          image: search-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SERVER_ADDRESS
+              value: "0.0.0.0:8080"

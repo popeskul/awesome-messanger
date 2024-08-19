@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: profile-service-blue
+  labels:
+    app: profile-service
+    version: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: profile-service
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: profile-service
+        version: blue
+    spec:
+      containers:
+        - name: profile-service
+          image: profile-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SERVER_ADDRESS
+              value: "0.0.0.0:8080"
