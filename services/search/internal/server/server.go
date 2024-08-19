@@ -26,8 +26,8 @@ func NewServer(cfg *config.Config, executableSchema graphql.ExecutableSchema) *S
 }
 
 func (s *Server) Start() {
-	log.Printf("connect to http://localhost%s/ for GraphQL playground", s.cfg.ServerAddress)
-	if err := http.ListenAndServe(s.cfg.ServerAddress, nil); err != nil {
+	log.Printf("connect to http://localhost%s/ for GraphQL playground", s.cfg.Server.HttpAddress)
+	if err := http.ListenAndServe(s.cfg.Server.HttpAddress, nil); err != nil {
 		log.Fatalf("could not start server: %v", err)
 	}
 }

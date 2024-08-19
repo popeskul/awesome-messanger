@@ -3,4 +3,5 @@ kind: ConfigMap
 metadata:
   name: friend-service-config
 data:
-  SERVER_ADDRESS: "0.0.0.0:8080"
+  SERVER_HTTP_ADDRESS: "0.0.0.0:8090"
+  SERVER_SWAGGER_ADDRESS: "localhost:8091"

@@ -26,7 +26,7 @@ func main() {
 	)
 
 	srv := server.NewServer(cfg, executableSchema)
-	log.Printf("Starting server on %s", cfg.ServerAddress)
+	log.Printf("Starting server on %s", cfg.Server.HttpAddress)
 
 	srv.Start()
 }

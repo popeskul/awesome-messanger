@@ -2,9 +2,13 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/bufbuild/protovalidate-go"
 	"github.com/popeskul/awesome-messanger/services/auth/internal/services"
-	"github.com/popeskul/awesome-messanger/services/auth/pb/proto"
+	"github.com/popeskul/awesome-messanger/services/auth/pkg/api/auth"
+	"github.com/popeskul/awesome-messanger/services/auth/pkg/api/grpcutils"
+	"github.com/popeskul/awesome-messanger/services/auth/pkg/api/health"
 )
 
 type Services interface {
@@ -12,88 +16,97 @@ type Services interface {
 	TokenService() services.TokenServiceI
 }
 
-type Validator interface {
-	Struct(interface{}) error
-}
-
 type Handler struct {
-	proto.UnimplementedAuthServiceServer
+	auth.UnimplementedAuthServiceServer
+	health.UnimplementedHealthServiceServer
 	services  Services
-	validator Validator
+	validator *protovalidate.Validator
 }
 
-func NewHandlers(services Services, validator Validator) *Handler {
+func NewHandlers(services Services) (*Handler, error) {
+	validator, err := protovalidate.New(
+		protovalidate.WithDisableLazy(true),
+		protovalidate.WithMessages(
+			&auth.RegisterRequest{},
+			&auth.LoginRequest{},
+			&auth.RefreshRequest{},
+			&auth.LogoutRequest{},
+			&health.HealthCheckRequest{},
+		),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create validator: %w", err)
+	}
+
 	return &Handler{
 		services:  services,
 		validator: validator,
-	}
+	}, nil
 }
 
-func (s *Handler) Login(ctx context.Context, req *proto.LoginRequest) (*proto.LoginResponse, error) {
-	input := LoginRequest{
-		Username: req.GetUsername(),
-		Password: req.GetPassword(),
+func (h *Handler) Login(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error) {
+	if err := h.validator.Validate(req); err != nil {
+		return nil, grpcutils.RPCValidationError(err)
 	}
 
-	if err := s.validator.Struct(input); err != nil {
-		return nil, err
-	}
-
-	token, err := s.services.AuthService().Login(ctx, input.Username, input.Password)
+	token, err := h.services.AuthService().Login(ctx, req.GetUsername(), req.GetPassword())
 	if err != nil {
 		return nil, err
 	}
 
-	return &proto.LoginResponse{Token: token}, nil
+	return &auth.LoginResponse{Token: token}, nil
 }
 
-func (s *Handler) Logout(ctx context.Context, req *proto.LogoutRequest) (*proto.LogoutResponse, error) {
-	input := LogoutRequest{
-		Token: req.GetToken(),
+func (h *Handler) Logout(ctx context.Context, req *auth.LogoutRequest) (*auth.LogoutResponse, error) {
+	if err := h.validator.Validate(req); err != nil {
+		return nil, grpcutils.RPCValidationError(err)
 	}
 
-	if err := s.validator.Struct(input); err != nil {
-		return nil, err
-	}
-
-	message, err := s.services.AuthService().Logout(ctx, input.Token)
+	message, err := h.services.AuthService().Logout(ctx, req.GetToken())
 	if err != nil {
 		return nil, err
 	}
 
-	return &proto.LogoutResponse{Message: message}, nil
+	return &auth.LogoutResponse{Message: message}, nil
 }
 
-func (s *Handler) Register(ctx context.Context, req *proto.RegisterRequest) (*proto.RegisterResponse, error) {
-	input := RegisterRequest{
-		Username: req.GetUsername(),
-		Password: req.GetPassword(),
+func (h *Handler) Register(ctx context.Context, req *auth.RegisterRequest) (*auth.RegisterResponse, error) {
+	if err := h.validator.Validate(req); err != nil {
+		return nil, grpcutils.RPCValidationError(err)
 	}
 
-	if err := s.validator.Struct(input); err != nil {
-		return nil, err
-	}
-
-	message, err := s.services.AuthService().Register(ctx, input.Username, input.Password)
+	message, err := h.services.AuthService().Register(ctx, req.GetUsername(), req.GetPassword())
 	if err != nil {
 		return nil, err
 	}
 
-	return &proto.RegisterResponse{Message: message}, nil
+	return &auth.RegisterResponse{Message: message}, nil
 }
 
-func (s *Handler) Refresh(ctx context.Context, req *proto.RefreshRequest) (*proto.RefreshResponse, error) {
-	input := RefreshRequest{
-		OldToken: req.GetOldToken(),
+func (h *Handler) Refresh(ctx context.Context, req *auth.RefreshRequest) (*auth.RefreshResponse, error) {
+	if err := h.validator.Validate(req); err != nil {
+		return nil, grpcutils.RPCValidationError(err)
 	}
 
-	if err := s.validator.Struct(input); err != nil {
-		return nil, err
-	}
-
-	newToken, err := s.services.AuthService().Refresh(ctx, req.GetOldToken())
+	newToken, err := h.services.AuthService().Refresh(ctx, req.GetOldToken())
 	if err != nil {
 		return nil, err
 	}
-	return &proto.RefreshResponse{NewToken: newToken}, nil
+	return &auth.RefreshResponse{NewToken: newToken}, nil
+}
+
+func (h *Handler) Check(ctx context.Context, req *health.HealthCheckRequest) (*health.HealthCheckResponse, error) {
+	return &health.HealthCheckResponse{Status: "healthy"}, nil
+}
+
+func (h *Handler) Liveness(ctx context.Context, req *health.HealthCheckRequest) (*health.HealthCheckResponse, error) {
+	return &health.HealthCheckResponse{Status: "alive"}, nil
+}
+
+func (h *Handler) Readiness(ctx context.Context, req *health.HealthCheckRequest) (*health.HealthCheckResponse, error) {
+	return &health.HealthCheckResponse{Status: "ready"}, nil
+}
+
+func (h *Handler) Healthz(ctx context.Context, req *health.HealthCheckRequest) (*health.HealthCheckResponse, error) {
+	return &health.HealthCheckResponse{Status: "healthy"}, nil
 }

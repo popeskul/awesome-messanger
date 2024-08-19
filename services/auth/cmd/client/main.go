@@ -4,12 +4,12 @@ import (
 	"context"
 	"log"
 
-	"github.com/popeskul/awesome-messanger/services/auth/pb/proto"
+	"github.com/popeskul/awesome-messanger/services/auth/pkg/api/auth"
 	"google.golang.org/grpc"
 )
 
 const (
-	address = "localhost:50051"
+	address = "localhost:50050"
 )
 
 func main() {
@@ -19,9 +19,9 @@ func main() {
 	}
 	defer conn.Close()
 
-	c := proto.NewAuthServiceClient(conn)
+	c := auth.NewAuthServiceClient(conn)
 
-	loginResp, err := c.Login(context.Background(), &proto.LoginRequest{
+	loginResp, err := c.Login(context.Background(), &auth.LoginRequest{
 		Username: "testuser",
 		Password: "testpassword",
 	})
@@ -35,7 +35,7 @@ func main() {
 
 	log.Printf("Login Response: %s", loginResp.GetToken())
 
-	registerResp, err := c.Register(context.Background(), &proto.RegisterRequest{
+	registerResp, err := c.Register(context.Background(), &auth.RegisterRequest{
 		Username: "newuser",
 		Password: "newpassword",
 	})
@@ -44,7 +44,7 @@ func main() {
 	}
 	log.Printf("Register Response: %s", registerResp.GetMessage())
 
-	refreshResp, err := c.Refresh(context.Background(), &proto.RefreshRequest{
+	refreshResp, err := c.Refresh(context.Background(), &auth.RefreshRequest{
 		OldToken: loginResp.GetToken(),
 	})
 	if err != nil {
@@ -53,7 +53,7 @@ func main() {
 
 	log.Printf("Refresh Response: %s", refreshResp.GetNewToken())
 
-	logoutResp, err := c.Logout(context.Background(), &proto.LogoutRequest{
+	logoutResp, err := c.Logout(context.Background(), &auth.LogoutRequest{
 		Token: loginResp.GetToken(),
 	})
 	if err != nil {

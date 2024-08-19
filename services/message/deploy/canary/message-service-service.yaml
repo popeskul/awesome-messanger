@@ -5,8 +5,13 @@ metadata:
 spec:
   selector:
     app: message-service
-    version: green
+    version: canary
   ports:
-    - protocol: TCP
-      port: 50052
-      targetPort: 50052
+    - name: grpc
+      protocol: TCP
+      port: 50060
+      targetPort: 50060
+    - name: http
+      protocol: TCP
+      port: 9000
+      targetPort: 9000

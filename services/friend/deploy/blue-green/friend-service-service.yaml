@@ -7,6 +7,11 @@ spec:
     app: friend-service
     version: green
   ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
+    - name: http
+      protocol: TCP
+      port: 8090
+      targetPort: 8090
+    - name: swagger
+      protocol: TCP
+      port: 8091
+      targetPort: 8091

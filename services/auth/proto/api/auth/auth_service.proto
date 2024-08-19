@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package auth;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/popeskul/awesome-messanger/services/auth/pkg/api/auth;auth";
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "AuthService API"
+    version: "1.0.0"
+    description: "This is the API for authentication services."
+    contact: {name: "Auth gRPC-Gateway project"}
+  }
+  external_docs: {
+    url: "https://github.com/grpc-ecosystem/grpc-gateway"
+    description: "Find out more about gRPC-Gateway"
+  }
+  schemes: [
+    HTTP,
+    HTTPS
+  ]
+};
+
+// AuthService provides authentication-related methods.
+service AuthService {
+  // Login authenticates a user and returns a token.
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/login"
+      body: "*"
+    };
+  }
+
+  // Logout invalidates a user's token.
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {
+    option (google.api.http) = {
+      post: "/v1/logout"
+      body: "*"
+    };
+  }
+
+  // Register creates a new user account.
+  rpc Register(RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/v1/register"
+      body: "*"
+    };
+  }
+
+  // Refresh issues a new token using an old token.
+  rpc Refresh(RefreshRequest) returns (RefreshResponse) {
+    option (google.api.http) = {
+      post: "/v1/refresh"
+      body: "*"
+    };
+  }
+}
+
+// LoginRequest is the request message for the Login RPC.
+message LoginRequest {
+  // username is the username of the user trying to log in.
+  string username = 1 [
+    json_name = "username",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // password is the password of the user trying to log in.
+  string password = 2 [
+    json_name = "password",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// LoginResponse is the response message for the Login RPC.
+message LoginResponse {
+  // token is the token issued to the user upon successful login.
+  string token = 1 [json_name = "token"];
+}
+
+// LogoutRequest is the request message for the Logout RPC.
+message LogoutRequest {
+  // token is the token to be invalidated.
+  string token = 1 [
+    json_name = "token",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// LogoutResponse is the response message for the Logout RPC.
+message LogoutResponse {
+  // message is a confirmation message indicating successful logout.
+  string message = 1 [json_name = "message"];
+}
+
+// RegisterRequest is the request message for the Register RPC.
+message RegisterRequest {
+  // username is the username of the user to be registered.
+  string username = 1 [
+    json_name = "username",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // password is the password of the user to be registered.
+  string password = 2 [
+    json_name = "password",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// RegisterResponse is the response message for the Register RPC.
+message RegisterResponse {
+  // message is a confirmation message indicating successful registration.
+  string message = 1 [json_name = "message"];
+}
+
+// RefreshRequest is the request message for the Refresh RPC.
+message RefreshRequest {
+  // old_token is the old token to be refreshed.
+  string old_token = 1 [
+    json_name = "old_token",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// RefreshResponse is the response message for the Refresh RPC.
+message RefreshResponse {
+  // new_token is the new token issued upon successful refresh.
+  string new_token = 1 [json_name = "new_token"];
+}

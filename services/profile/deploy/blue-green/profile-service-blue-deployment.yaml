@@ -20,12 +20,18 @@ spec:
       containers:
         - name: profile-service
           image: profile-service:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 50054
+            - containerPort: 50080
+            - containerPort: 9020
           env:
-            - name: SERVER_ADDRESS
+            - name: SERVER_HTTP_ADDRESS
               valueFrom:
                 configMapKeyRef:
                   name: profile-service-config
-                  key: SERVER_ADDRESS
+                  key: SERVER_HTTP_ADDRESS
+            - name: SERVER_GRPC_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: profile-service-config
+                  key: SERVER_GRPC_ADDRESS

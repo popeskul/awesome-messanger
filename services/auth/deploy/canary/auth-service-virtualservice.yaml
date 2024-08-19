@@ -15,4 +15,5 @@ spec:
             host: auth-service
             subset: canary
           weight: 10
-      port: 50051
+      port:
+        number: 8080

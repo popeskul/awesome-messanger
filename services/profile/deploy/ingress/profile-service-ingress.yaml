@@ -15,4 +15,4 @@ spec:
               service:
                 name: profile-service
                 port:
-                  number: 50054
+                  number: 9020

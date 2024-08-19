@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package profile;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/popeskul/awesome-messanger/services/profile/proto/api/profile";
+
+// ProfileService provides methods for managing user profiles.
+service ProfileService {
+  // CreateProfile creates a new profile for a user.
+  rpc CreateProfile(CreateProfileRequest) returns (CreateProfileResponse) {
+    option (google.api.http) = {
+      post: "/v1/profiles"
+      body: "*"
+    };
+  }
+
+  // UpdateProfile updates the profile information for a user.
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse) {
+    option (google.api.http) = {
+      post: "/v1/profiles/{user_id}"
+      body: "*"
+    };
+  }
+
+  // GetProfile retrieves the profile information for a user.
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse) {
+    option (google.api.http) = {get: "/v1/profiles/{user_id}"};
+  }
+}
+
+// CreateProfileRequest is the request message for creating a profile.
+message CreateProfileRequest {
+  // user_id is the ID of the user for whom the profile is being created.
+  string user_id = 1 [
+    json_name = "user_id",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // nickname is the user's nickname.
+  string nickname = 2 [json_name = "nickname"];
+
+  // bio is the user's biography.
+  string bio = 3 [json_name = "bio"];
+
+  // avatar_url is the URL of the user's avatar image.
+  string avatar_url = 4 [json_name = "avatar_url"];
+}
+
+// CreateProfileResponse is the response message for creating a profile.
+message CreateProfileResponse {
+  // success indicates whether the profile creation was successful.
+  bool success = 1 [json_name = "success"];
+
+  // message provides additional information about the creation status.
+  string message = 2 [json_name = "message"];
+}
+
+// UpdateProfileRequest is the request message for updating a profile.
+message UpdateProfileRequest {
+  // user_id is the ID of the user whose profile is being updated.
+  string user_id = 1 [
+    json_name = "user_id",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // nickname is the user's new nickname.
+  string nickname = 2 [json_name = "nickname"];
+
+  // bio is the user's new biography.
+  string bio = 3 [json_name = "bio"];
+
+  // avatar_url is the URL of the user's new avatar image.
+  string avatar_url = 4 [json_name = "avatar_url"];
+}
+
+// UpdateProfileResponse is the response message for updating a profile.
+message UpdateProfileResponse {
+  // success indicates whether the profile update was successful.
+  bool success = 1 [json_name = "success"];
+
+  // message provides additional information about the update status.
+  string message = 2 [json_name = "message"];
+}
+
+// GetProfileRequest is the request message for retrieving a profile.
+message GetProfileRequest {
+  // user_id is the ID of the user whose profile is being retrieved.
+  string user_id = 1 [
+    json_name = "user_id",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// GetProfileResponse is the response message for retrieving a profile.
+message GetProfileResponse {
+  // user_id is the ID of the user.
+  string user_id = 1 [json_name = "user_id"];
+
+  // nickname is the user's nickname.
+  string nickname = 2 [json_name = "nickname"];
+
+  // bio is the user's biography.
+  string bio = 3 [json_name = "bio"];
+
+  // avatar_url is the URL of the user's avatar image.
+  string avatar_url = 4 [json_name = "avatar_url"];
+}

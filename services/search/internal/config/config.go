@@ -5,19 +5,31 @@ import (
 	"os"
 )
 
-// Config holds the configuration values for the application
 type Config struct {
-	ServerAddress string
+	Server Server
 }
 
-// LoadConfig loads configuration from environment variables
+type Server struct {
+	HttpAddress string
+	GrpcAddress string
+}
+
 func LoadConfig() (*Config, error) {
-	serverAddress := os.Getenv("SERVER_ADDRESS")
-	if serverAddress == "" {
-		return nil, errors.New("SERVER_ADDRESS is required")
+	HttpAddress := os.Getenv("SERVER_HTTP_ADDRESS")
+	GrpcAddress := os.Getenv("SERVER_GRPC_ADDRESS")
+
+	if HttpAddress == "" {
+		return nil, errors.New("SERVER_HTTP_ADDRESS is required")
+	}
+
+	if GrpcAddress == "" {
+		return nil, errors.New("SERVER_GRPC_ADDRESS is required")
 	}
 
 	return &Config{
-		ServerAddress: serverAddress,
+		Server: Server{
+			HttpAddress: HttpAddress,
+			GrpcAddress: GrpcAddress,
+		},
 	}, nil
 }

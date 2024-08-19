@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package message;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/popeskul/awesome-messanger/services/message/pkg/api/message;message";
+
+// MessageService provides methods to handle messages.
+service MessageService {
+  // GetMessages retrieves messages from a chat.
+  rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse) {
+    option (google.api.http) = {
+      get: "/v1/messages/{chat_id}"
+      // Removed the body field for GET method
+    };
+  }
+
+  // SendMessage sends a new message.
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages"
+      body: "*"
+    };
+  }
+}
+
+// GetMessagesRequest is the request message for the GetMessages RPC.
+message GetMessagesRequest {
+  // chat_id is the ID of the chat to retrieve messages from.
+  string chat_id = 1 [
+    json_name = "chat_id",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// GetMessagesResponse is the response message for the GetMessages RPC.
+message GetMessagesResponse {
+  // messages is a list of messages from the chat.
+  repeated Message messages = 1 [json_name = "messages"];
+}
+
+// SendMessageRequest is the request message for the SendMessage RPC.
+message SendMessageRequest {
+  // sender_id is the ID of the message sender.
+  string sender_id = 1 [
+    json_name = "sender_id",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // recipient_id is the ID of the message recipient.
+  string recipient_id = 2 [
+    json_name = "recipient_id",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // content is the content of the message.
+  string content = 3 [
+    json_name = "content",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// SendMessageResponse is the response message for the SendMessage RPC.
+message SendMessageResponse {
+  // success indicates whether the message was sent successfully.
+  bool success = 1 [json_name = "success"];
+}
+
+// Message represents a single message in a chat.
+message Message {
+  // sender_id is the ID of the sender of the message.
+  string sender_id = 1 [json_name = "sender_id"];
+
+  // content is the content of the message.
+  string content = 2 [json_name = "content"];
+
+  // timestamp is the time when the message was sent.
+  int64 timestamp = 3 [json_name = "timestamp"];
+}

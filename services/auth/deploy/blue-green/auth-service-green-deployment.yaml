@@ -22,10 +22,22 @@ spec:
           image: auth-service:latest
           imagePullPolicy: Never
           ports:
-            - containerPort: 50051
+            - containerPort: 50050
+            - containerPort: 8080
+            - containerPort: 8081
           env:
-            - name: SERVER_ADDRESS
+            - name: SERVER_HTTP_ADDRESS
               valueFrom:
                 configMapKeyRef:
                   name: auth-service-config
-                  key: SERVER_ADDRESS
+                  key: SERVER_HTTP_ADDRESS
+            - name: SERVER_GRPC_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: auth-service-config
+                  key: SERVER_GRPC_ADDRESS
+            - name: SERVER_SWAGGER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: auth-service-config
+                  key: SERVER_SWAGGER_ADDRESS

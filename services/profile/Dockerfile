@@ -22,8 +22,9 @@ FROM scratch
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/profile-service /app/profile-service
 
-# Expose port 50054 to the outside world
-EXPOSE 50054
+# Expose ports for gRPC and HTTP
+EXPOSE 50080
+EXPOSE 9020
 
 # Command to run the executable
 ENTRYPOINT ["/app/profile-service"]

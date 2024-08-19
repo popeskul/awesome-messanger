@@ -37,3 +37,14 @@ func (s *ProfileService) GetProfile(ctx context.Context, req *model.GetProfileRe
 		AvatarUrl: "avatar_url",
 	}, nil
 }
+
+func (s *ProfileService) CreateProfile(ctx context.Context, req *model.CreateProfileRequest) (*model.Profile, error) {
+	s.logger.Printf("CreateProfile called")
+
+	return &model.Profile{
+		UserId:    req.UserId,
+		Nickname:  req.Nickname,
+		Bio:       req.Bio,
+		AvatarUrl: req.AvatarUrl,
+	}, nil
+}

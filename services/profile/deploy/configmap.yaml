@@ -3,4 +3,5 @@ kind: ConfigMap
 metadata:
   name: profile-service-config
 data:
-  SERVER_ADDRESS: "0.0.0.0:50054"
+  SERVER_HTTP_ADDRESS: "0.0.0.0:9020"
+  SERVER_GRPC_ADDRESS: "0.0.0.0:50080"

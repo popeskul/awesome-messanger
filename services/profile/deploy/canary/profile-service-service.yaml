@@ -5,7 +5,13 @@ metadata:
 spec:
   selector:
     app: profile-service
+    version: canary
   ports:
-    - protocol: TCP
-      port: 50054
-      targetPort: 50054
+    - name: grpc
+      protocol: TCP
+      port: 50080
+      targetPort: 50080
+    - name: http
+      protocol: TCP
+      port: 9020
+      targetPort: 9020

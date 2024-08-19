@@ -22,8 +22,16 @@ FROM scratch
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/auth-service /app/auth-service
 
-# Expose port 50051 to the outside world
-EXPOSE 50051
+# Copy the swagger directory
+COPY swagger /app/swagger
+
+# Set the working directory
+WORKDIR /app
+
+# Expose ports for gRPC and HTTP
+EXPOSE 50050
+EXPOSE 8080
+EXPOSE 8081
 
 # Command to run the executable
 ENTRYPOINT ["/app/auth-service"]

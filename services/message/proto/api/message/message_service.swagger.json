@@ -1,0 +1,182 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/message/message_service.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "MessageService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/messages": {
+      "post": {
+        "summary": "SendMessage sends a new message.",
+        "operationId": "MessageService_SendMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/messageSendMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "SendMessageRequest is the request message for the SendMessage RPC.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/messageSendMessageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MessageService"
+        ]
+      }
+    },
+    "/v1/messages/{chat_id}": {
+      "get": {
+        "summary": "GetMessages retrieves messages from a chat.",
+        "operationId": "MessageService_GetMessages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/messageGetMessagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "chat_id",
+            "description": "chat_id is the ID of the chat to retrieve messages from.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MessageService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "messageGetMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/messageMessage"
+          },
+          "description": "messages is a list of messages from the chat."
+        }
+      },
+      "description": "GetMessagesResponse is the response message for the GetMessages RPC."
+    },
+    "messageMessage": {
+      "type": "object",
+      "properties": {
+        "sender_id": {
+          "type": "string",
+          "description": "sender_id is the ID of the sender of the message."
+        },
+        "content": {
+          "type": "string",
+          "description": "content is the content of the message."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "int64",
+          "description": "timestamp is the time when the message was sent."
+        }
+      },
+      "description": "Message represents a single message in a chat."
+    },
+    "messageSendMessageRequest": {
+      "type": "object",
+      "properties": {
+        "sender_id": {
+          "type": "string",
+          "description": "sender_id is the ID of the message sender."
+        },
+        "recipient_id": {
+          "type": "string",
+          "description": "recipient_id is the ID of the message recipient."
+        },
+        "content": {
+          "type": "string",
+          "description": "content is the content of the message."
+        }
+      },
+      "description": "SendMessageRequest is the request message for the SendMessage RPC.",
+      "required": [
+        "sender_id",
+        "recipient_id",
+        "content"
+      ]
+    },
+    "messageSendMessageResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "success indicates whether the message was sent successfully."
+        }
+      },
+      "description": "SendMessageResponse is the response message for the SendMessage RPC."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

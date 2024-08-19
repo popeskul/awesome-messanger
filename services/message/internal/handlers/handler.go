@@ -2,10 +2,14 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/bufbuild/protovalidate-go"
 	"github.com/popeskul/awesome-messanger/services/message/internal/models"
 	"github.com/popeskul/awesome-messanger/services/message/internal/services"
-	"github.com/popeskul/awesome-messanger/services/message/pb/proto"
+	"github.com/popeskul/awesome-messanger/services/message/pkg/api/health"
+	"github.com/popeskul/awesome-messanger/services/message/pkg/api/message"
+	"github.com/popeskul/awesome-messanger/services/message/proto/api/grpcutils"
 )
 
 type Service interface {
@@ -13,17 +17,36 @@ type Service interface {
 }
 
 type Handler struct {
-	proto.UnimplementedMessageServiceServer
-	service Service
+	message.UnimplementedMessageServiceServer
+	health.UnimplementedHealthServiceServer
+	service   Service
+	validator *protovalidate.Validator
 }
 
-func NewHandler(service Service) *Handler {
-	return &Handler{
-		service: service,
+func NewHandler(service Service) (*Handler, error) {
+	validator, err := protovalidate.New(
+		protovalidate.WithDisableLazy(true),
+		protovalidate.WithMessages(
+			&message.GetMessagesRequest{},
+			&message.SendMessageRequest{},
+			&health.HealthCheckRequest{},
+		),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create validator: %w", err)
 	}
+
+	return &Handler{
+		service:   service,
+		validator: validator,
+	}, nil
 }
 
-func (h *Handler) GetMessages(ctx context.Context, req *proto.GetMessagesRequest) (*proto.GetMessagesResponse, error) {
+func (h *Handler) GetMessages(ctx context.Context, req *message.GetMessagesRequest) (*message.GetMessagesResponse, error) {
+	if err := h.validator.Validate(req); err != nil {
+		return nil, grpcutils.RPCValidationError(err)
+	}
+
 	input := &models.GetMessagesRequest{
 		ChatId: req.GetChatId(),
 	}
@@ -33,15 +56,15 @@ func (h *Handler) GetMessages(ctx context.Context, req *proto.GetMessagesRequest
 		return nil, err
 	}
 
-	var pbMessages []*proto.Message
-	for _, message := range messages {
-		pbMessages = append(pbMessages, message.ConvertToProto())
+	var pbMessages []*message.Message
+	for _, m := range messages {
+		pbMessages = append(pbMessages, m.ConvertToProto())
 	}
 
-	return &proto.GetMessagesResponse{Messages: pbMessages}, nil
+	return &message.GetMessagesResponse{Messages: pbMessages}, nil
 }
 
-func (h *Handler) SendMessage(ctx context.Context, req *proto.SendMessageRequest) (*proto.SendMessageResponse, error) {
+func (h *Handler) SendMessage(ctx context.Context, req *message.SendMessageRequest) (*message.SendMessageResponse, error) {
 	input := &models.SendMessageRequest{
 		SenderId:    req.GetSenderId(),
 		RecipientId: req.GetRecipientId(),
@@ -53,7 +76,23 @@ func (h *Handler) SendMessage(ctx context.Context, req *proto.SendMessageRequest
 		return nil, err
 	}
 
-	return &proto.SendMessageResponse{
+	return &message.SendMessageResponse{
 		Success: true,
 	}, nil
+}
+
+func (h *Handler) Check(ctx context.Context, req *health.HealthCheckRequest) (*health.HealthCheckResponse, error) {
+	return &health.HealthCheckResponse{Status: "healthy"}, nil
+}
+
+func (h *Handler) Liveness(ctx context.Context, req *health.HealthCheckRequest) (*health.HealthCheckResponse, error) {
+	return &health.HealthCheckResponse{Status: "alive"}, nil
+}
+
+func (h *Handler) Readiness(ctx context.Context, req *health.HealthCheckRequest) (*health.HealthCheckResponse, error) {
+	return &health.HealthCheckResponse{Status: "ready"}, nil
+}
+
+func (h *Handler) Healthz(ctx context.Context, req *health.HealthCheckRequest) (*health.HealthCheckResponse, error) {
+	return &health.HealthCheckResponse{Status: "healthy"}, nil
 }

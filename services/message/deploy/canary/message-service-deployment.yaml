@@ -20,10 +20,16 @@ spec:
         - name: message-service
           image: message-service:latest
           ports:
-            - containerPort: 50052
+            - containerPort: 50060
+            - containerPort: 9000
           env:
-            - name: SERVER_ADDRESS
+            - name: SERVER_HTTP_ADDRESS
               valueFrom:
                 configMapKeyRef:
                   name: message-service-config
-                  key: SERVER_ADDRESS
+                  key: SERVER_HTTP_ADDRESS
+            - name: SERVER_GRPC_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: message-service-config
+                  key: SERVER_GRPC_ADDRESS

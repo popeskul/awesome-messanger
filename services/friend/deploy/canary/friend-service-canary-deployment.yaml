@@ -21,10 +21,16 @@ spec:
         - name: friend-service
           image: friend-service:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 8090
+            - containerPort: 8091
           env:
-            - name: SERVER_ADDRESS
+            - name: SERVER_HTTP_ADDRESS
               valueFrom:
                 configMapKeyRef:
                   name: friend-service-config
-                  key: SERVER_ADDRESS
+                  key: SERVER_HTTP_ADDRESS
+            - name: SERVER_SWAGGER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: friend-service-config
+                  key: SERVER_SWAGGER_ADDRESS
