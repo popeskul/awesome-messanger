@@ -9,13 +9,16 @@ all: build deploy-blue-green
 build:
 	eval $$(minikube docker-env --shell bash) && docker build -t $(DOCKER_IMAGE) .
 
-deploy-blue-green:
+create-configmap:
+	kubectl apply -f deploy/configmap.yaml
+
+deploy-blue-green: create-configmap
 	kubectl apply -f deploy/blue-green/search-service-blue-deployment.yaml
 	kubectl apply -f deploy/blue-green/search-service-green-deployment.yaml
 	kubectl apply -f deploy/blue-green/search-service-service.yaml
 	$(MAKE) logs
 
-deploy-canary:
+deploy-canary: create-configmap
 	kubectl apply -f deploy/canary/search-service-deployment.yaml
 	kubectl apply -f deploy/canary/search-service-canary-deployment.yaml
 	kubectl apply -f deploy/canary/search-service-service.yaml
@@ -48,3 +51,14 @@ clean:
 	kubectl delete -f deploy/canary/search-service-canary-deployment.yaml || true
 	kubectl delete -f deploy/canary/search-service-service.yaml || true
 	kubectl delete -f deploy/canary/search-service-virtualservice.yaml || true
+
+# Port forward to the pod for local testing
+port-forward:
+	@echo "Finding pod for service $(IMAGE_NAME)..."
+	@POD_NAME=$$(kubectl get pods -l app=$(IMAGE_NAME) -o jsonpath='{.items[0].metadata.name}'); \
+	if [ -z "$$POD_NAME" ]; then \
+		echo "No pod found for label app=$(IMAGE_NAME)"; \
+		exit 1; \
+	fi; \
+	echo "Port forwarding from local port 8081 to pod $$POD_NAME"; \
+	kubectl port-forward pod/$$POD_NAME 8081:8081 &

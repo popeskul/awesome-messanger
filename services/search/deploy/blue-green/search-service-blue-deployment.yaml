@@ -22,7 +22,10 @@ spec:
           image: search-service:latest
           imagePullPolicy: Never
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
           env:
             - name: SERVER_ADDRESS
-              value: "0.0.0.0:8080"
+              valueFrom:
+                configMapKeyRef:
+                  name: search-service-config
+                  key: SERVER_ADDRESS

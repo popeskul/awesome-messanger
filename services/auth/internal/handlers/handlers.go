@@ -1,31 +1,99 @@
 package handlers
 
-import "net/http"
+import (
+	"context"
 
-// Handler holds dependencies for the handlers
+	"github.com/popeskul/awesome-messanger/services/auth/internal/services"
+	"github.com/popeskul/awesome-messanger/services/auth/pb/proto"
+)
+
+type Services interface {
+	AuthService() services.AuthServiceI
+	TokenService() services.TokenServiceI
+}
+
+type Validator interface {
+	Struct(interface{}) error
+}
+
 type Handler struct {
-	// Add any dependencies here
+	proto.UnimplementedAuthServiceServer
+	services  Services
+	validator Validator
 }
 
-// NewHandler creates a new Handler instance
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandlers(services Services, validator Validator) *Handler {
+	return &Handler{
+		services:  services,
+		validator: validator,
+	}
 }
 
-// LoginHandler handles login requests
-func (h *Handler) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Login handler"))
+func (s *Handler) Login(ctx context.Context, req *proto.LoginRequest) (*proto.LoginResponse, error) {
+	input := LoginRequest{
+		Username: req.GetUsername(),
+		Password: req.GetPassword(),
+	}
+
+	if err := s.validator.Struct(input); err != nil {
+		return nil, err
+	}
+
+	token, err := s.services.AuthService().Login(ctx, input.Username, input.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.LoginResponse{Token: token}, nil
 }
 
-// LivenessHandler checks if the service is alive
-func (h *Handler) LivenessHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Liveness probe successful for auth service"))
+func (s *Handler) Logout(ctx context.Context, req *proto.LogoutRequest) (*proto.LogoutResponse, error) {
+	input := LogoutRequest{
+		Token: req.GetToken(),
+	}
+
+	if err := s.validator.Struct(input); err != nil {
+		return nil, err
+	}
+
+	message, err := s.services.AuthService().Logout(ctx, input.Token)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.LogoutResponse{Message: message}, nil
 }
 
-// ReadinessHandler checks if the service is ready
-func (h *Handler) ReadinessHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Readiness probe successful for auth service"))
+func (s *Handler) Register(ctx context.Context, req *proto.RegisterRequest) (*proto.RegisterResponse, error) {
+	input := RegisterRequest{
+		Username: req.GetUsername(),
+		Password: req.GetPassword(),
+	}
+
+	if err := s.validator.Struct(input); err != nil {
+		return nil, err
+	}
+
+	message, err := s.services.AuthService().Register(ctx, input.Username, input.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.RegisterResponse{Message: message}, nil
+}
+
+func (s *Handler) Refresh(ctx context.Context, req *proto.RefreshRequest) (*proto.RefreshResponse, error) {
+	input := RefreshRequest{
+		OldToken: req.GetOldToken(),
+	}
+
+	if err := s.validator.Struct(input); err != nil {
+		return nil, err
+	}
+
+	newToken, err := s.services.AuthService().Refresh(ctx, req.GetOldToken())
+	if err != nil {
+		return nil, err
+	}
+	return &proto.RefreshResponse{NewToken: newToken}, nil
 }

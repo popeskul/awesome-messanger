@@ -4,21 +4,26 @@ metadata:
   name: auth-service
   labels:
     app: auth-service
-    version: stable
 spec:
-  replicas: 5
+  replicas: 3
   selector:
     matchLabels:
       app: auth-service
-      version: stable
+      version: canary
   template:
     metadata:
       labels:
         app: auth-service
-        version: stable
+        version: canary
     spec:
       containers:
         - name: auth-service
-          image: your-registry/auth-service:stable
+          image: auth-service:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 50051
+          env:
+            - name: SERVER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: auth-service-config
+                  key: SERVER_ADDRESS

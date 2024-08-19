@@ -1,31 +1,48 @@
 package handlers
 
-import "net/http"
+import (
+	"context"
 
-// Handler holds dependencies for the handlers
+	"github.com/popeskul/awesome-messanger/services/notification/internal/models"
+	"github.com/popeskul/awesome-messanger/services/notification/internal/services"
+	"github.com/popeskul/awesome-messanger/services/notification/pb/proto"
+)
+
+type Services interface {
+	NotificationService() services.NotificationServiceI
+}
+
+type Validator interface {
+	Struct(interface{}) error
+}
+
 type Handler struct {
-	// Add any dependencies here
+	proto.UnimplementedNotificationServiceServer
+	services  Services
+	validator Validator
 }
 
-// NewHandler creates a new Handler instance
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(services Services, validator Validator) *Handler {
+	return &Handler{
+		services:  services,
+		validator: validator,
+	}
 }
 
-// NotifyHandler handles sending notifications
-func (h *Handler) NotifyHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Notification handler"))
-}
+func (h *Handler) SendNotification(ctx context.Context, req *proto.SendNotificationRequest) (*proto.SendNotificationResponse, error) {
+	model := &models.SendNotificationRequest{
+		RecipientId: req.GetRecipientId(),
+		Message:     req.GetMessage(),
+	}
 
-// LivenessHandler checks if the service is alive
-func (h *Handler) LivenessHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Liveness probe successful for notification service"))
-}
+	if err := h.validator.Struct(model); err != nil {
+		return nil, err
+	}
 
-// ReadinessHandler checks if the service is ready
-func (h *Handler) ReadinessHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Readiness probe successful for notification service"))
+	err := h.services.NotificationService().SendNotification(ctx, model)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.SendNotificationResponse{}, nil
 }

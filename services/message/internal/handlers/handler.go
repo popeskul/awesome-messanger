@@ -1,31 +1,59 @@
 package handlers
 
-import "net/http"
+import (
+	"context"
 
-// Handler holds dependencies for the handlers
+	"github.com/popeskul/awesome-messanger/services/message/internal/models"
+	"github.com/popeskul/awesome-messanger/services/message/internal/services"
+	"github.com/popeskul/awesome-messanger/services/message/pb/proto"
+)
+
+type Service interface {
+	MessageService() services.MessageServiceI
+}
+
 type Handler struct {
-	// Add any dependencies here
+	proto.UnimplementedMessageServiceServer
+	service Service
 }
 
-// NewHandler creates a new Handler instance
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(service Service) *Handler {
+	return &Handler{
+		service: service,
+	}
 }
 
-// SendMessageHandler handles sending messages
-func (h *Handler) SendMessageHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Send message handler"))
+func (h *Handler) GetMessages(ctx context.Context, req *proto.GetMessagesRequest) (*proto.GetMessagesResponse, error) {
+	input := &models.GetMessagesRequest{
+		ChatId: req.GetChatId(),
+	}
+
+	messages, err := h.service.MessageService().GetMessages(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	var pbMessages []*proto.Message
+	for _, message := range messages {
+		pbMessages = append(pbMessages, message.ConvertToProto())
+	}
+
+	return &proto.GetMessagesResponse{Messages: pbMessages}, nil
 }
 
-// LivenessHandler checks if the service is alive
-func (h *Handler) LivenessHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Liveness probe successful for message service"))
-}
+func (h *Handler) SendMessage(ctx context.Context, req *proto.SendMessageRequest) (*proto.SendMessageResponse, error) {
+	input := &models.SendMessageRequest{
+		SenderId:    req.GetSenderId(),
+		RecipientId: req.GetRecipientId(),
+		Content:     req.GetContent(),
+	}
 
-// ReadinessHandler checks if the service is ready
-func (h *Handler) ReadinessHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Readiness probe successful for message service"))
+	err := h.service.MessageService().SendMessage(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.SendMessageResponse{
+		Success: true,
+	}, nil
 }

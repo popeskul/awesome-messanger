@@ -1,4 +1,4 @@
-.PHONY: all build deploy logs service status clean
+.PHONY: all build deploy-blue-green deploy-canary status logs service clean
 
 IMAGE_NAME := friend-service
 IMAGE_TAG := latest
@@ -9,13 +9,16 @@ all: build deploy-blue-green
 build:
 	eval $$(minikube docker-env --shell bash) && docker build -t $(DOCKER_IMAGE) .
 
-deploy-blue-green:
+create-configmap:
+	kubectl apply -f deploy/configmap.yaml
+
+deploy-blue-green: create-configmap
 	kubectl apply -f deploy/blue-green/friend-service-blue-deployment.yaml
 	kubectl apply -f deploy/blue-green/friend-service-green-deployment.yaml
 	kubectl apply -f deploy/blue-green/friend-service-service.yaml
 	$(MAKE) logs
 
-deploy-canary:
+deploy-canary: create-configmap
 	kubectl apply -f deploy/canary/friend-service-deployment.yaml
 	kubectl apply -f deploy/canary/friend-service-canary-deployment.yaml
 	kubectl apply -f deploy/canary/friend-service-service.yaml
@@ -41,6 +44,7 @@ service:
 	minikube service friend-service
 
 clean:
+	kubectl delete -f deploy/configmap.yaml || true
 	kubectl delete -f deploy/blue-green/friend-service-blue-deployment.yaml || true
 	kubectl delete -f deploy/blue-green/friend-service-green-deployment.yaml || true
 	kubectl delete -f deploy/blue-green/friend-service-service.yaml || true
@@ -48,3 +52,17 @@ clean:
 	kubectl delete -f deploy/canary/friend-service-canary-deployment.yaml || true
 	kubectl delete -f deploy/canary/friend-service-service.yaml || true
 	kubectl delete -f deploy/canary/friend-service-virtualservice.yaml || true
+
+# Port forward to the pod for local testing
+port-forward:
+	@echo "Finding pod for service $(IMAGE_NAME)..."
+	@POD_NAME=$$(kubectl get pods -l app=$(IMAGE_NAME) -o jsonpath='{.items[0].metadata.name}'); \
+	if [ -z "$$POD_NAME" ]; then \
+		echo "No pod found for label app=$(IMAGE_NAME)"; \
+		exit 1; \
+	fi; \
+	echo "Port forwarding from local port 8080 to pod $$POD_NAME"; \
+	kubectl port-forward pod/$$POD_NAME 8080:8080 &
+
+generate:
+	go generate ./...

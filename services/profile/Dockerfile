@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o /app/profile-service ./cmd/main.go
+RUN go build -o /app/profile-service ./cmd/server/main.go
 
 # Start a new stage from scratch
 FROM scratch
@@ -22,8 +22,8 @@ FROM scratch
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/profile-service /app/profile-service
 
-# Expose port 8080 to the outside world
-EXPOSE 8081
+# Expose port 50054 to the outside world
+EXPOSE 50054
 
 # Command to run the executable
 ENTRYPOINT ["/app/profile-service"]

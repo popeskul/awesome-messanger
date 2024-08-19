@@ -5,12 +5,10 @@ import (
 	"os"
 )
 
-// Config holds the configuration values for the application
 type Config struct {
 	ServerAddress string
 }
 
-// LoadConfig loads configuration from environment variables
 func LoadConfig() (*Config, error) {
 	serverAddress := os.Getenv("SERVER_ADDRESS")
 	if serverAddress == "" {

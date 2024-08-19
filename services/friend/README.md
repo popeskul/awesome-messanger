@@ -16,27 +16,34 @@ This repository contains multiple microservices, each with its own Dockerfile an
 minikube start
 ```
 
-### Building Docker Images
-
-Setting Docker Environment to Minikube
-Before building the Docker images, set the Docker environment to Minikube:
-
-```sh
-eval $(minikube docker-env)
-```
-
 ### Building and Deploying Services
-Each service has its own Makefile that automates the build and deployment process. Below are the steps to build and deploy each service.
-
-## Services
-### Auth Service
 
 Build and deploy using the following commands:
 
 ```sh
-make
+make # run default target
 # or 
 make build
 make deploy-blue-green
 make deploy-canary
+```
+
+### Requests
+
+Send a request to the service using the following command:
+    
+```sh
+curl -v -X POST "http://localhost:8080/add-friend" \
+     -H "Content-Type: application/json" \
+     -d '{"userId": "user123", "friendId": "friend456"}'
+
+curl -v -X GET "http://localhost:8080/friends?userId=user123"
+
+curl -v -X GET "http://localhost:8080/live"
+
+curl -v -X GET "http://localhost:8080/ready"
+
+curl -v -X POST "http://localhost:8080/respond-friend-request" \
+     -H "Content-Type: application/json" \
+     -d '{"friendId": "friend456", "response": "accepted"}'
 ```

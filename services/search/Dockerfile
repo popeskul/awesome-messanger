@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o /app/search-service ./cmd/main.go
+RUN go build -o /app/search-service ./cmd/server/main.go
 
 # Start a new stage from scratch
 FROM scratch
@@ -22,8 +22,8 @@ FROM scratch
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/search-service /app/search-service
 
-# Expose port 8080 to the outside world
-EXPOSE 8085
+# Expose port 8081 to the outside world
+EXPOSE 8081
 
 # Command to run the executable
 ENTRYPOINT ["/app/search-service"]

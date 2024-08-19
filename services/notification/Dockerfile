@@ -14,16 +14,16 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o /app/message-service ./cmd/main.go
+RUN go build -o /app/notification-service ./cmd/server/main.go
 
 # Start a new stage from scratch
 FROM scratch
 
 # Copy the Pre-built binary file from the previous stage
-COPY --from=builder /app/message-service /app/message-service
+COPY --from=builder /app/notification-service /app/notification-service
 
-# Expose port 8080 to the outside world
-EXPOSE 8084
+# Expose port 50053 to the outside world
+EXPOSE 50053
 
 # Command to run the executable
-ENTRYPOINT ["/app/message-service"]
+ENTRYPOINT ["/app/notification-service"]
