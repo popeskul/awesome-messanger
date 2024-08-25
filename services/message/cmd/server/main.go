@@ -1,40 +1,41 @@
 package main
 
 import (
-	"log"
+	"context"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
-	"github.com/popeskul/awesome-messanger/services/message/internal/config"
-	"github.com/popeskul/awesome-messanger/services/message/internal/handlers"
-	"github.com/popeskul/awesome-messanger/services/message/internal/server/grpc"
-	"github.com/popeskul/awesome-messanger/services/message/internal/server/http"
-	"github.com/popeskul/awesome-messanger/services/message/internal/services"
+	"github.com/popeskul/awesome-messanger/services/message/internal/di"
 )
 
 func main() {
-	cfg, err := config.LoadConfig()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+	defer stop()
+
+	app, err := di.InitializeApp()
 	if err != nil {
-		log.Fatalf("Error loading config: %v", err)
+		app.Logger.Error("Failed to initialize application", "error", err)
+		os.Exit(1)
 	}
-
-	logger := log.New(log.Writer(), "message: ", log.LstdFlags)
-	messageService := services.NewMessageService(logger)
-	service := services.NewService(messageService)
-
-	handler, err := handlers.NewHandler(service)
-	if err != nil {
-		log.Fatalf("Error creating handlers: %v", err)
-	}
-
-	grpcServer := grpc.NewGrpcServer(handler)
-	gatewayServer := http.NewGatewayServer(handler)
 
 	go func() {
-		if err := grpcServer.ListenAndServe(cfg.Server.GrpcAddress); err != nil {
-			log.Fatalf("Failed to start gRPC server: %v", err)
+		if err = app.Run(); err != nil {
+			app.Logger.Error("Failed to run application", "error", err)
+			stop()
 		}
 	}()
 
-	if err := gatewayServer.ListenAndServe(cfg.Server.HttpAddress); err != nil {
-		log.Fatalf("Failed to start HTTP server: %v", err)
+	<-ctx.Done()
+
+	shutdownCtx, cancelShutdown := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelShutdown()
+
+	if err = app.Stop(shutdownCtx); err != nil {
+		app.Logger.Error("Error during application shutdown", "error", err)
+		os.Exit(1)
 	}
+
+	app.Logger.Info("Server exiting")
 }

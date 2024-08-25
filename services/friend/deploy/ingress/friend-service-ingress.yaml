@@ -15,11 +15,11 @@ spec:
               service:
                 name: friend-service
                 port:
-                  number: 8090
+                  number: 8010
           - path: /swagger
             pathType: Prefix
             backend:
               service:
                 name: friend-service
                 port:
-                  number: 8091
+                  number: 8011

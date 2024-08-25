@@ -3,5 +3,6 @@ kind: ConfigMap
 metadata:
   name: notification-service-config
 data:
-  SERVER_HTTP_ADDRESS: "0.0.0.0:9000"
-  SERVER_GRPC_ADDRESS: "0.0.0.0:50070"
+  SERVER_GRPC_ADDRESS: "0.0.0.0:50030"
+  SERVER_GATEWAY_ADDRESS: "0.0.0.0:8030"
+  SERVER_SWAGGER_ADDRESS: "0.0.0.0:8031"

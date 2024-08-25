@@ -9,9 +9,13 @@ spec:
   ports:
     - name: grpc
       protocol: TCP
-      port: 50070
-      targetPort: 50070
+      port: 50030
+      targetPort: 50030
     - name: http
       protocol: TCP
-      port: 9010
-      targetPort: 9010
+      port: 8030
+      targetPort: 8030
+    - name: swagger
+      protocol: TCP
+      port: 8031
+      targetPort: 8031

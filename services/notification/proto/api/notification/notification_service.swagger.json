@@ -32,7 +32,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/messageSendNotificationResponse"
+              "$ref": "#/definitions/notificationSendNotificationResponse"
             }
           },
           "default": {
@@ -49,7 +49,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/messageSendNotificationRequest"
+              "$ref": "#/definitions/notificationSendNotificationRequest"
             }
           }
         ],
@@ -60,7 +60,7 @@
     }
   },
   "definitions": {
-    "messageSendNotificationRequest": {
+    "notificationSendNotificationRequest": {
       "type": "object",
       "properties": {
         "recipient_id": {
@@ -78,7 +78,7 @@
         "message"
       ]
     },
-    "messageSendNotificationResponse": {
+    "notificationSendNotificationResponse": {
       "type": "object",
       "properties": {
         "success": {

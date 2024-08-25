@@ -1,50 +1,41 @@
 package main
 
 import (
-	"log"
+	"context"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
-	"github.com/popeskul/awesome-messanger/services/auth/internal/config"
-	"github.com/popeskul/awesome-messanger/services/auth/internal/handlers"
-	"github.com/popeskul/awesome-messanger/services/auth/internal/server/grpc"
-	"github.com/popeskul/awesome-messanger/services/auth/internal/server/http"
-	"github.com/popeskul/awesome-messanger/services/auth/internal/services"
-	"github.com/popeskul/awesome-messanger/services/auth/internal/swagger"
+	"github.com/popeskul/awesome-messanger/services/auth/internal/di"
 )
 
 func main() {
-	cfg, err := config.LoadConfig()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+	defer stop()
+
+	app, err := di.InitializeApp()
 	if err != nil {
-		log.Fatalf("Error loading config: %v", err)
+		app.Logger.Error("Failed to initialize application", "error", err)
+		os.Exit(1)
 	}
-
-	logger := log.New(log.Writer(), "auth: ", log.LstdFlags)
-
-	authService := services.NewAuthService(logger)
-	tokenService := services.NewTokenService(logger)
-	service := services.NewService(tokenService, authService)
-
-	handler, err := handlers.NewHandlers(service)
-	if err != nil {
-		log.Fatalf("Error creating handlers: %v", err)
-	}
-
-	grpcServer := grpc.NewGrpcServer(handler)
-	gatewayServer := http.NewGatewayServer(handler)
 
 	go func() {
-		swaggerServer := swagger.NewSwaggerServer(cfg.Server.SwaggerAddress, "http://"+cfg.Server.HttpAddress)
-		if err := swaggerServer.Run(); err != nil {
-			log.Fatalf("Failed to start Swagger UI server: %v", err)
+		if err = app.Run(); err != nil {
+			app.Logger.Error("Failed to run application", "error", err)
+			stop()
 		}
 	}()
 
-	go func() {
-		if err := grpcServer.ListenAndServe(cfg.Server.GrpcAddress); err != nil {
-			log.Fatalf("Failed to start gRPC server: %v", err)
-		}
-	}()
+	<-ctx.Done()
 
-	if err := gatewayServer.ListenAndServe(cfg.Server.HttpAddress); err != nil {
-		log.Fatalf("Failed to start HTTP server: %v", err)
+	shutdownCtx, cancelShutdown := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelShutdown()
+
+	if err = app.Stop(shutdownCtx); err != nil {
+		app.Logger.Error("Error during application shutdown", "error", err)
+		os.Exit(1)
 	}
+
+	app.Logger.Info("Server exiting")
 }

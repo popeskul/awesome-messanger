@@ -36,9 +36,10 @@ make deploy-canary
 Send a request to the service using the following command:
     
 ```sh
-curl http://localhost:9020/v1/health
-curl http://localhost:9020/v1/liveness
-curl http://localhost:9020/v1/readiness
-curl http://localhost:9020/v1/healthz
+http://localhost:8041/swagger/index.html
 
+curl http://localhost:8040/v1/health
+curl http://localhost:8040/v1/liveness
+curl http://localhost:8040/v1/readiness
+curl http://localhost:8040/v1/healthz
 ```

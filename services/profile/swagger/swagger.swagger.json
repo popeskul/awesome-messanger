@@ -1,0 +1,365 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/profile/profile_service.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ProfileService"
+    },
+    {
+      "name": "HealthService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/health": {
+      "get": {
+        "summary": "Check performs a general health check.",
+        "operationId": "HealthService_Check",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/healthHealthCheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "HealthService"
+        ]
+      }
+    },
+    "/v1/healthz": {
+      "get": {
+        "summary": "Healthz is a legacy endpoint for health checks.",
+        "operationId": "HealthService_Healthz",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/healthHealthCheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "HealthService"
+        ]
+      }
+    },
+    "/v1/liveness": {
+      "get": {
+        "summary": "Liveness checks if the service is alive.",
+        "operationId": "HealthService_Liveness",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/healthHealthCheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "HealthService"
+        ]
+      }
+    },
+    "/v1/profiles": {
+      "post": {
+        "summary": "CreateProfile creates a new profile for a user.",
+        "operationId": "ProfileService_CreateProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/profileCreateProfileResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "CreateProfileRequest is the request message for creating a profile.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/profileCreateProfileRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ProfileService"
+        ]
+      }
+    },
+    "/v1/profiles/{user_id}": {
+      "get": {
+        "summary": "GetProfile retrieves the profile information for a user.",
+        "operationId": "ProfileService_GetProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/profileGetProfileResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "description": "user_id is the ID of the user whose profile is being retrieved.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ProfileService"
+        ]
+      },
+      "post": {
+        "summary": "UpdateProfile updates the profile information for a user.",
+        "operationId": "ProfileService_UpdateProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/profileUpdateProfileResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "description": "user_id is the ID of the user whose profile is being updated.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ProfileServiceUpdateProfileBody"
+            }
+          }
+        ],
+        "tags": [
+          "ProfileService"
+        ]
+      }
+    },
+    "/v1/readiness": {
+      "get": {
+        "summary": "Readiness checks if the service is ready to serve traffic.",
+        "operationId": "HealthService_Readiness",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/healthHealthCheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "HealthService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ProfileServiceUpdateProfileBody": {
+      "type": "object",
+      "properties": {
+        "nickname": {
+          "type": "string",
+          "description": "nickname is the user's new nickname."
+        },
+        "bio": {
+          "type": "string",
+          "description": "bio is the user's new biography."
+        },
+        "avatar_url": {
+          "type": "string",
+          "description": "avatar_url is the URL of the user's new avatar image."
+        }
+      },
+      "description": "UpdateProfileRequest is the request message for updating a profile."
+    },
+    "healthHealthCheckResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/healthHealthStatus",
+          "description": "status is the health status of the service."
+        }
+      },
+      "description": "HealthCheckResponse is the response message for health check RPCs."
+    },
+    "healthHealthStatus": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "HEALTHY",
+        "UNHEALTHY",
+        "ALIVE",
+        "READY"
+      ],
+      "default": "UNKNOWN",
+      "description": "HealthStatus is the status of the service."
+    },
+    "profileCreateProfileRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "description": "user_id is the ID of the user for whom the profile is being created."
+        },
+        "nickname": {
+          "type": "string",
+          "description": "nickname is the user's nickname."
+        },
+        "bio": {
+          "type": "string",
+          "description": "bio is the user's biography."
+        },
+        "avatar_url": {
+          "type": "string",
+          "description": "avatar_url is the URL of the user's avatar image."
+        }
+      },
+      "description": "CreateProfileRequest is the request message for creating a profile.",
+      "required": [
+        "user_id"
+      ]
+    },
+    "profileCreateProfileResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "success indicates whether the profile creation was successful."
+        },
+        "message": {
+          "type": "string",
+          "description": "message provides additional information about the creation status."
+        }
+      },
+      "description": "CreateProfileResponse is the response message for creating a profile."
+    },
+    "profileGetProfileResponse": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "description": "user_id is the ID of the user."
+        },
+        "nickname": {
+          "type": "string",
+          "description": "nickname is the user's nickname."
+        },
+        "bio": {
+          "type": "string",
+          "description": "bio is the user's biography."
+        },
+        "avatar_url": {
+          "type": "string",
+          "description": "avatar_url is the URL of the user's avatar image."
+        }
+      },
+      "description": "GetProfileResponse is the response message for retrieving a profile."
+    },
+    "profileUpdateProfileResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "success indicates whether the profile update was successful."
+        },
+        "message": {
+          "type": "string",
+          "description": "message provides additional information about the update status."
+        }
+      },
+      "description": "UpdateProfileResponse is the response message for updating a profile."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": null
+}

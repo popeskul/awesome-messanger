@@ -16,4 +16,15 @@ spec:
             subset: canary
           weight: 10
       port:
-        number: 8080
+        number: 8000
+    - route:
+        - destination:
+            host: auth-service
+            subset: stable
+          weight: 90
+        - destination:
+            host: auth-service
+            subset: canary
+          weight: 10
+      port:
+        number: 8001

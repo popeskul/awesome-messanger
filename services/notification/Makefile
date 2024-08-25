@@ -2,7 +2,7 @@
         kube-deploy-canary kube-status kube-logs kube-service kube-clean vendor .vendor-reset \
         .vendor-google-protobuf .vendor-googleapis .vendor-protovalidate .vendor-tidy port-forward \
         generate .protoc-generate .bin-deps .tidy .kube-apply-ingress .kube-deploy-ingress-controller \
-        lint .proto-lint .buf-generate proto-format
+        lint .proto-lint .buf-generate proto-format wire swagger-generate
 
 IMAGE_NAME := notification-service
 IMAGE_TAG := latest
@@ -13,6 +13,7 @@ PROTOC_GEN_GO_GRPC := $(shell which protoc-gen-go-grpc)
 PROTOC := $(shell which protoc)
 PROTO_PATH := $(CURDIR)/proto
 PKG_PROTO_PATH := $(CURDIR)/pkg
+SWAGGER_OUT_PATH := $(CURDIR)/swagger
 
 LOCAL_BIN := $(CURDIR)/bin
 
@@ -139,25 +140,43 @@ port-forward:
 		exit 1; \
 	fi; \
 	echo "Port forwarding from local ports to pod $$POD_NAME"; \
-	kubectl port-forward pod/$$POD_NAME 9010:9010 & \
-	kubectl port-forward pod/$$POD_NAME 50070:50070 &
+	kubectl port-forward pod/$$POD_NAME 8030:8030 & \
+	kubectl port-forward pod/$$POD_NAME 8031:8031 & \
+	kubectl port-forward pod/$$POD_NAME 50030:50030 &
 
-generate: .bin-deps .buf-generate proto-format .tidy
+generate: .bin-deps .buf-generate proto-format .tidy wire swagger-generate
+
+SWAGGER_UI_VERSION := 4.15.5
+SWAGGER_UI_URL := https://github.com/swagger-api/swagger-ui/archive/v$(SWAGGER_UI_VERSION).tar.gz
 
 .protoc-generate:
-	mkdir -p $(PKG_PROTO_PATH)
-	$(PROTOC) -I $(CURDIR)/proto \
-		-I $(VENDOR_PROTO_PATH) \
-		--proto_path=$(CURDIR) \
-		--go_out=$(PKG_PROTO_PATH) --go_opt paths=source_relative \
-		--go-grpc_out=$(PKG_PROTO_PATH) --go-grpc_opt paths=source_relative \
-		--grpc-gateway_out=$(PKG_PROTO_PATH) --grpc-gateway_opt paths=source_relative \
-		--grpc-gateway_opt generate_unbound_methods=true \
-		$(PROTO_PATH)/notification/notification_service.proto $(PROTO_PATH)/health/health_service.proto
+	@mkdir -p api
+	$(PROTOC) -I $(CURDIR)/proto -I $(VENDOR_PROTO_PATH) --proto_path=$(CURDIR) \
+	   --go_out=$(PKG_PROTO_PATH) --go_opt paths=source_relative \
+	   --go-grpc_out=$(PKG_PROTO_PATH) --go-grpc_opt paths=source_relative \
+	   --grpc-gateway_out=$(PKG_PROTO_PATH) --grpc-gateway_opt paths=source_relative \
+	   --grpc-gateway_opt generate_unbound_methods=true \
+	   --openapiv2_out=api --openapiv2_opt logtostderr=true \
+	   --openapiv2_opt allow_merge=true --openapiv2_opt merge_file_name=swagger \
+	   $(CURDIR)/proto/api/notification/notification_service.proto $(CURDIR)/proto/api/health/health_service.proto
+	@echo "PROTO_PATH=$(PROTO_PATH)"
+	@echo "VENDOR_PROTO_PATH=$(VENDOR_PROTO_PATH)"
+	@echo "CURDIR=$(CURDIR)"
 
-	$(PROTOC) -I $(VENDOR_PROTO_PATH) --proto_path=$(CURDIR) \
-		--openapiv2_out=. --openapiv2_opt logtostderr=true \
-		$(PROTO_PATH)/notification/notification_service.proto $(PROTO_PATH)/health/health_service.proto
+swagger-generate: .protoc-generate
+	@echo "Combining Swagger files..."
+	@mkdir -p swagger
+	@./scripts/combine_swagger.sh
+	@echo "Downloading and extracting Swagger UI..."
+	@curl -sL $(SWAGGER_UI_URL) -o swagger-ui.tar.gz
+	@tar -xzf swagger-ui.tar.gz
+	@cp -r swagger-ui-$(SWAGGER_UI_VERSION)/dist/* swagger/
+	@rm -rf swagger-ui-$(SWAGGER_UI_VERSION) swagger-ui.tar.gz
+	@echo "Swagger UI files copied to swagger/"
+	@echo "Updating Swagger UI configuration..."
+	@awk '{gsub("https://petstore.swagger.io/v2/swagger.json", "swagger.swagger.json")}1' swagger/swagger-initializer.js > temp.js && mv temp.js swagger/swagger-initializer.js
+	@echo "Swagger UI configuration updated."
+	@rm -rf api
 
 .buf-generate:
 	$(info run buf generate...)
@@ -186,3 +205,6 @@ lint: .proto-lint
 
 .proto-lint:
 	$(LOCAL_BIN)/protolint -config_path ./.protolint.yaml ./proto/
+
+wire:
+	wire ./internal/di/wire.go

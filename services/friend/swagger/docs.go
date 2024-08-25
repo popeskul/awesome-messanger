@@ -35,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.FriendRequest"
+                            "$ref": "#/definitions/http.FriendRequest"
                         }
                     }
                 ],
@@ -89,7 +89,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handlers.Friend"
+                                "$ref": "#/definitions/http.Friend"
                             }
                         }
                     },
@@ -156,7 +156,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.PostRespondFriendRequestJSONRequestBody"
+                            "$ref": "#/definitions/http.PostRespondFriendRequestJSONRequestBody"
                         }
                     }
                 ],
@@ -184,7 +184,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handlers.Friend": {
+        "http.Friend": {
             "type": "object",
             "properties": {
                 "friendId": {
@@ -195,7 +195,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.FriendRequest": {
+        "http.FriendRequest": {
             "type": "object",
             "required": [
                 "friendId",
@@ -210,7 +210,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.PostRespondFriendRequestJSONRequestBody": {
+        "http.PostRespondFriendRequestJSONRequestBody": {
             "type": "object",
             "required": [
                 "accept",
@@ -236,7 +236,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8090",
-	BasePath:         "/",
+	BasePath:         "/v1",
 	Schemes:          []string{},
 	Title:            "Friend Service API",
 	Description:      "This is a Friend service API",

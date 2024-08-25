@@ -24,7 +24,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/messageCreateProfileResponse"
+              "$ref": "#/definitions/profileCreateProfileResponse"
             }
           },
           "default": {
@@ -41,7 +41,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/messageCreateProfileRequest"
+              "$ref": "#/definitions/profileCreateProfileRequest"
             }
           }
         ],
@@ -58,7 +58,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/messageGetProfileResponse"
+              "$ref": "#/definitions/profileGetProfileResponse"
             }
           },
           "default": {
@@ -88,7 +88,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/messageUpdateProfileResponse"
+              "$ref": "#/definitions/profileUpdateProfileResponse"
             }
           },
           "default": {
@@ -140,7 +140,7 @@
       },
       "description": "UpdateProfileRequest is the request message for updating a profile."
     },
-    "messageCreateProfileRequest": {
+    "profileCreateProfileRequest": {
       "type": "object",
       "properties": {
         "user_id": {
@@ -165,7 +165,7 @@
         "user_id"
       ]
     },
-    "messageCreateProfileResponse": {
+    "profileCreateProfileResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -179,7 +179,7 @@
       },
       "description": "CreateProfileResponse is the response message for creating a profile."
     },
-    "messageGetProfileResponse": {
+    "profileGetProfileResponse": {
       "type": "object",
       "properties": {
         "user_id": {
@@ -201,7 +201,7 @@
       },
       "description": "GetProfileResponse is the response message for retrieving a profile."
     },
-    "messageUpdateProfileResponse": {
+    "profileUpdateProfileResponse": {
       "type": "object",
       "properties": {
         "success": {

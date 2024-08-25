@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	url := "http://localhost:9030/graphql"
+	url := "http://localhost:8050/graphql"
 	query := `
     {
         "query": "{ search(nickname: \"example_nickname\") { id nickname description } }"

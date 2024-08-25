@@ -9,9 +9,9 @@ spec:
   ports:
     - name: grpc
       protocol: TCP
-      port: 50090
-      targetPort: 50090
+      port: 50050
+      targetPort: 50050
     - name: http
       protocol: TCP
-      port: 9030
-      targetPort: 9030
+      port: 8050
+      targetPort: 8050

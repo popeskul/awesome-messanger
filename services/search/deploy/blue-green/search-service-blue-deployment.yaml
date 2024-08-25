@@ -22,8 +22,8 @@ spec:
           image: search-service:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 50090
-            - containerPort: 9030
+            - containerPort: 50050
+            - containerPort: 8050
           env:
             - name: SERVER_HTTP_ADDRESS
               valueFrom:

@@ -15,4 +15,4 @@ spec:
               service:
                 name: profile-service
                 port:
-                  number: 9020
+                  number: 8040

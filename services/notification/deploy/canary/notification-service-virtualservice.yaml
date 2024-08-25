@@ -16,4 +16,4 @@ spec:
             subset: canary
           weight: 10
       port:
-        number: 9010
+        number: 8030
