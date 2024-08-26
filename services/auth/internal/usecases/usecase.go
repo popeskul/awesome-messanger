@@ -4,25 +4,25 @@ import (
 	"github.com/popeskul/awesome-messanger/services/auth/internal/core/ports"
 )
 
-type UseCases struct {
+type UseCase struct {
 	auth  ports.AuthUseCase
 	token ports.TokenUseCase
 }
 
-func NewUseCases(
+func NewUseCase(
 	authUseCase ports.AuthUseCase,
 	tokenUseCase ports.TokenUseCase,
-) *UseCases {
-	return &UseCases{
+) *UseCase {
+	return &UseCase{
 		auth:  authUseCase,
 		token: tokenUseCase,
 	}
 }
 
-func (u *UseCases) AuthUseCase() ports.AuthUseCase {
+func (u *UseCase) AuthUseCase() ports.AuthUseCase {
 	return u.auth
 }
 
-func (u *UseCases) TokenUseCase() ports.TokenUseCase {
+func (u *UseCase) TokenUseCase() ports.TokenUseCase {
 	return u.token
 }

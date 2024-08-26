@@ -15,7 +15,7 @@ import (
 	"github.com/popeskul/awesome-messanger/services/friend/internal/core/ports"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/delivery/http"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/swagger"
-	"github.com/popeskul/awesome-messanger/services/friend/internal/usecases"
+	"github.com/popeskul/awesome-messanger/services/friend/internal/usecase"
 )
 
 func InitializeApp() (*app.App, error) {
@@ -24,7 +24,8 @@ func InitializeApp() (*app.App, error) {
 		provideZapLogger,
 		wire.Bind(new(ports.Logger), new(*logger.ZapLogger)),
 		logger.NewZapLogger,
-		usecases.NewUseCases,
+		usecase.NewFriendUseCase,
+		usecase.NewUseCase,
 		wire.Bind(new(http.Validator), new(*validator.Validate)),
 		validator.New,
 		http.NewHandler,

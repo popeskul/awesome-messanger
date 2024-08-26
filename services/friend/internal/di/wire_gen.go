@@ -14,7 +14,7 @@ import (
 	"github.com/popeskul/awesome-messanger/services/friend/internal/config"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/delivery/http"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/swagger"
-	"github.com/popeskul/awesome-messanger/services/friend/internal/usecases"
+	"github.com/popeskul/awesome-messanger/services/friend/internal/usecase"
 	"go.uber.org/zap"
 )
 
@@ -30,9 +30,10 @@ func InitializeApp() (*app.App, error) {
 		return nil, err
 	}
 	loggerZapLogger := logger.NewZapLogger(zapLogger)
-	useCases := usecases.NewUseCases(loggerZapLogger)
+	friendUseCase := usecase.NewFriendUseCase(loggerZapLogger)
+	useCase := usecase.NewUseCase(friendUseCase)
 	validate := validator.New()
-	handlerFriends := http.NewHandler(useCases, validate)
+	handlerFriends := http.NewHandler(useCase, validate)
 	serverServer := server.NewServer(configConfig, handlerFriends, loggerZapLogger)
 	swaggerServer := swagger.NewSwaggerServer(configConfig, loggerZapLogger)
 	appApp := app.NewApp(configConfig, loggerZapLogger, serverServer, swaggerServer)

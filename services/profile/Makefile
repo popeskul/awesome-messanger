@@ -147,7 +147,7 @@ port-forward:
 SWAGGER_UI_VERSION := 4.15.5
 SWAGGER_UI_URL := https://github.com/swagger-api/swagger-ui/archive/v$(SWAGGER_UI_VERSION).tar.gz
 
-generate: .bin-deps .buf-generate proto-format .tidy swagger-generate
+generate: .bin-deps .buf-generate proto-format .tidy swagger-generate gogenerate
 
 .protoc-generate:
 	@mkdir -p api
@@ -208,3 +208,14 @@ lint: .proto-lint
 
 wire:
 	wire ./internal/di/wire.go
+
+gogenerate:
+	go generate ./...
+
+test:
+	go test ./...
+
+test-coverage:
+	go test -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report generated: coverage.html"

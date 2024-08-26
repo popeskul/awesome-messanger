@@ -3,8 +3,8 @@ package handlers
 import (
 	"context"
 
-	"github.com/popeskul/awesome-messanger/services/message/internal/core/domain"
 	"github.com/popeskul/awesome-messanger/services/message/internal/core/ports"
+	"github.com/popeskul/awesome-messanger/services/message/internal/delivery/grpc/converters"
 	"github.com/popeskul/awesome-messanger/services/message/pkg/api/message"
 	"github.com/popeskul/awesome-messanger/services/message/proto/api/grpcutils"
 )
@@ -34,36 +34,49 @@ func (h *MessageHandler) GetMessages(ctx context.Context, req *message.GetMessag
 		return nil, grpcutils.RPCValidationError(err)
 	}
 
-	input := &domain.GetMessagesRequest{
-		ChatId: req.GetChatId(),
-	}
+	input := converters.GRPCGetMessagesRequestToDomainGetMessagesRequest(req)
 
 	messages, err := h.messageUseCase.GetMessages(ctx, input)
 	if err != nil {
 		return nil, err
 	}
 
-	var pbMessages []*message.Message
-	for _, m := range messages {
-		pbMessages = append(pbMessages, m.ConvertToProto())
-	}
-
-	return &message.GetMessagesResponse{Messages: pbMessages}, nil
+	return converters.DomainGetMessagesResponseToGRPCGetMessagesResponse(messages), nil
 }
 
 func (h *MessageHandler) SendMessage(ctx context.Context, req *message.SendMessageRequest) (*message.SendMessageResponse, error) {
-	input := &domain.SendMessageRequest{
-		SenderId:    req.GetSenderId(),
-		RecipientId: req.GetRecipientId(),
-		Content:     req.GetContent(),
+	if err := h.validator.Validate(req); err != nil {
+		return nil, grpcutils.RPCValidationError(err)
 	}
 
-	err := h.messageUseCase.SendMessage(ctx, input)
+	input := converters.GRPCSendMessageRequestToDomainSendMessageRequest(req)
+
+	resp, err := h.messageUseCase.SendMessage(ctx, input)
 	if err != nil {
 		return nil, err
 	}
 
-	return &message.SendMessageResponse{
-		Success: true,
-	}, nil
+	return converters.DomainSendMessageResponseToGRPCSendMessageResponse(resp), nil
+}
+
+func (h *MessageHandler) StreamMessages(req *message.StreamMessagesRequest, stream message.MessageService_StreamMessagesServer) error {
+	if err := h.validator.Validate(req); err != nil {
+		return grpcutils.RPCValidationError(err)
+	}
+
+	input := converters.GRPCStreamMessagesRequestToDomainStreamMessagesRequest(req)
+
+	messageChan, err := h.messageUseCase.StreamMessages(stream.Context(), input)
+	if err != nil {
+		return err
+	}
+
+	for msg := range messageChan {
+		grpcMsg := converters.DomainMessageToGRPCMessage(msg)
+		if err := stream.Send(grpcMsg); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

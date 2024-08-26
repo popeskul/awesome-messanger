@@ -143,7 +143,7 @@ port-forward:
 	kubectl port-forward pod/$$POD_NAME 8021:8021 & \
 	kubectl port-forward pod/$$POD_NAME 50020:50020 &
 
-generate: .bin-deps .buf-generate proto-format .tidy wire swagger-generate
+generate: .bin-deps .buf-generate proto-format .tidy wire swagger-generate gogenerate
 
 SWAGGER_UI_VERSION := 4.15.5
 SWAGGER_UI_URL := https://github.com/swagger-api/swagger-ui/archive/v$(SWAGGER_UI_VERSION).tar.gz
@@ -208,3 +208,14 @@ lint: .proto-lint
 
 wire:
 	wire ./internal/di/wire.go
+
+gogenerate:
+	go generate ./...
+
+test:
+	go test ./...
+
+test-coverage:
+	go test -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report generated: coverage.html"

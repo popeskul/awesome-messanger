@@ -10,6 +10,6 @@ type NotificationUseCase interface {
 	SendNotification(ctx context.Context, req *domain.SendNotificationRequest) (*domain.SendNotificationResponse, error)
 }
 
-type UserCase interface {
-	MessageUseCase() NotificationUseCase
+type UseCase interface {
+	Notification() NotificationUseCase
 }

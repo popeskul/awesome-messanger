@@ -11,7 +11,7 @@ var jwtSecret = []byte("your-secret-key")
 
 type TokenService struct{}
 
-func NewTokenService() ports.Token {
+func NewTokenService() ports.TokenManager {
 	return &TokenService{}
 }
 

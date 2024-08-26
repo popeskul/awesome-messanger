@@ -6,12 +6,12 @@ type service struct {
 	notificationUseCase ports.NotificationUseCase
 }
 
-func NewUseCase(useCase ports.NotificationUseCase) ports.UserCase {
+func NewUseCase(useCase ports.NotificationUseCase) ports.UseCase {
 	return &service{
 		notificationUseCase: useCase,
 	}
 }
 
-func (s *service) MessageUseCase() ports.NotificationUseCase {
-	return s.MessageUseCase()
+func (s *service) Notification() ports.NotificationUseCase {
+	return s.notificationUseCase
 }
