@@ -1,6 +1,3 @@
-//go:build wireinject
-// +build wireinject
-
 package di
 
 import (
@@ -17,6 +14,7 @@ import (
 	"github.com/popeskul/awesome-messanger/services/friend/internal/core/ports"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/delivery/http"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/repository"
+	"github.com/popeskul/awesome-messanger/services/friend/internal/service"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/swagger"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/usecase"
 	platformConfig "github.com/popeskul/awesome-messanger/services/platform/database/postgres/config"
@@ -31,7 +29,7 @@ func InitializeApp(ctx context.Context) (*app.App, error) {
 		provideConnection,
 		wire.Bind(new(ports.Logger), new(*logger.ZapLogger)),
 		logger.NewZapLogger,
-		provideFriendRepository,
+		provideRepository,
 		usecase.NewFriendUseCase,
 		usecase.NewUseCase,
 		wire.Bind(new(http.Validator), new(*validator.Validate)),
@@ -39,6 +37,8 @@ func InitializeApp(ctx context.Context) (*app.App, error) {
 		http.NewHandler,
 		server.NewServer,
 		swagger.NewSwaggerServer,
+		provideOutboxProcessor,
+		provideService,
 		app.NewApp,
 	)
 	return &app.App{}, nil
@@ -46,11 +46,6 @@ func InitializeApp(ctx context.Context) (*app.App, error) {
 
 func provideZapLogger() (*zap.Logger, error) {
 	return zap.NewProduction()
-}
-
-func provideFriendRepository(conn platformPorts.Connection) ports.FriendRepository {
-	repos := repository.NewRepositories(conn)
-	return repos.Friend()
 }
 
 func provideConnection(ctx context.Context, cfg *config.Config) (platformPorts.Connection, error) {
@@ -63,4 +58,16 @@ func provideConnection(ctx context.Context, cfg *config.Config) (platformPorts.C
 		HealthCheckPeriod: cfg.Database.HealthCheckPeriod,
 	}
 	return connection.New(ctx, platformCfg)
+}
+
+func provideRepository(conn platformPorts.Connection) ports.Repository {
+	return repository.NewRepositories(conn)
+}
+
+func provideOutboxProcessor(repo ports.Repository, logger ports.Logger) ports.OutboxProcessor {
+	return service.NewOutboxProcessor(repo, logger)
+}
+
+func provideService(processor ports.OutboxProcessor) ports.Service {
+	return service.NewService(processor)
 }

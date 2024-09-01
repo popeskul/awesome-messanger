@@ -1,9 +1,12 @@
 .PHONY: kube-deploy .build-image .kube-apply-configmap .kube-apply-namespace .kube-deploy-blue-green \
-		.kube-deploy-canary .kube-status .kube-logs .kube-service kube-clean port-forward generate swagger-generate
+		.kube-deploy-canary .kube-status .kube-logs .kube-service kube-clean port-forward generate swagger-generate \
+		gogenerate test test-coverage wire migrate-create migrate-up migrate-down migrate-force
 
 IMAGE_NAME := friend-service
 IMAGE_TAG := latest
 DOCKER_IMAGE := $(IMAGE_NAME):$(IMAGE_TAG)
+
+MIGRATIONS_FOLDER := migrations
 
 kube-deploy: .build-image .kube-deploy-blue-green
 
@@ -103,3 +106,16 @@ test-coverage:
 
 wire:
 	wire ./internal/di/wire.go
+
+# Migration commands
+migrate-create:
+	migrate create -ext sql -dir $(MIGRATIONS_FOLDER) -seq $(name)
+
+migrate-up:
+	migrate -path $(MIGRATIONS_FOLDER) -database $(DATABASE_URL) up
+
+migrate-down:
+	migrate -path $(MIGRATIONS_FOLDER) -database $(DATABASE_URL) down
+
+migrate-force:
+	migrate -path $(MIGRATIONS_FOLDER) -database $(DATABASE_URL) force $(version)
