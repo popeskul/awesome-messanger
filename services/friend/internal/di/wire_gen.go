@@ -16,6 +16,7 @@ import (
 	ports2 "github.com/popeskul/awesome-messanger/services/friend/internal/core/ports"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/delivery/http"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/repository"
+	"github.com/popeskul/awesome-messanger/services/friend/internal/service"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/swagger"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/usecase"
 	config2 "github.com/popeskul/awesome-messanger/services/platform/database/postgres/config"
@@ -40,14 +41,16 @@ func InitializeApp(ctx context.Context) (*app.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	friendRepository := provideFriendRepository(connection)
-	friendUseCase := usecase.NewFriendUseCase(loggerZapLogger, friendRepository)
+	repository := provideRepository(connection)
+	friendUseCase := usecase.NewFriendUseCase(loggerZapLogger, repository)
 	useCase := usecase.NewUseCase(friendUseCase)
 	validate := validator.New()
 	handlerFriends := http.NewHandler(useCase, validate)
 	serverServer := server.NewServer(configConfig, handlerFriends, loggerZapLogger)
 	swaggerServer := swagger.NewSwaggerServer(configConfig, loggerZapLogger)
-	appApp := app.NewApp(configConfig, loggerZapLogger, serverServer, swaggerServer)
+	outboxProcessor := provideOutboxProcessor(repository, loggerZapLogger)
+	service := provideService(outboxProcessor)
+	appApp := app.NewApp(configConfig, loggerZapLogger, serverServer, swaggerServer, service)
 	return appApp, nil
 }
 
@@ -55,11 +58,6 @@ func InitializeApp(ctx context.Context) (*app.App, error) {
 
 func provideZapLogger() (*zap.Logger, error) {
 	return zap.NewProduction()
-}
-
-func provideFriendRepository(conn ports.Connection) ports2.FriendRepository {
-	repos := repository.NewRepositories(conn)
-	return repos.Friend()
 }
 
 func provideConnection(ctx context.Context, cfg *config.Config) (ports.Connection, error) {
@@ -72,4 +70,16 @@ func provideConnection(ctx context.Context, cfg *config.Config) (ports.Connectio
 		HealthCheckPeriod: cfg.Database.HealthCheckPeriod,
 	}
 	return connection.New(ctx, platformCfg)
+}
+
+func provideRepository(conn ports.Connection) ports2.Repository {
+	return repository.NewRepositories(conn)
+}
+
+func provideOutboxProcessor(repo ports2.Repository, logger2 ports2.Logger) ports2.OutboxProcessor {
+	return service.NewOutboxProcessor(repo, logger2)
+}
+
+func provideService(processor ports2.OutboxProcessor) ports2.Service {
+	return service.NewService(processor)
 }

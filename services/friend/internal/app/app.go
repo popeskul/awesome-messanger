@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-
 	"golang.org/x/sync/errgroup"
 
 	"github.com/popeskul/awesome-messanger/services/friend/internal/adapters/http/server"
@@ -16,6 +15,7 @@ type App struct {
 	cfg           *config.Config
 	httpServer    *server.Server
 	swaggerServer *swagger.Server
+	service       ports.Service
 	Logger        ports.Logger
 }
 
@@ -24,12 +24,14 @@ func NewApp(
 	logger ports.Logger,
 	httpServer *server.Server,
 	swaggerServer *swagger.Server,
+	service ports.Service,
 ) *App {
 	return &App{
 		cfg:           cfg,
 		httpServer:    httpServer,
 		swaggerServer: swaggerServer,
 		Logger:        logger,
+		service:       service,
 	}
 }
 
@@ -42,6 +44,11 @@ func (a *App) Run() error {
 
 	group.Go(func() error {
 		return a.swaggerServer.Run()
+	})
+
+	group.Go(func() error {
+		a.service.OutboxProcessor().Start(ctx)
+		return nil
 	})
 
 	if err := group.Wait(); err != nil {
@@ -64,6 +71,11 @@ func (a *App) Stop(ctx context.Context) error {
 
 	group.Go(func() error {
 		return a.swaggerServer.Shutdown(ctx)
+	})
+
+	group.Go(func() error {
+		a.service.OutboxProcessor().Stop()
+		return nil
 	})
 
 	return group.Wait()
