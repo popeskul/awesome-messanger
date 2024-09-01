@@ -16,16 +16,18 @@ import (
 func TestFriendUseCase_Success(t *testing.T) {
 	tests := []struct {
 		name      string
-		mockSetup func(*gomock.Controller) ports.Logger
+		mockSetup func(*gomock.Controller) (ports.Logger, ports.FriendRepository)
 		method    func(ports.FriendUseCase) (interface{}, error)
 		want      interface{}
 	}{
 		{
 			name: "AddFriend_Success",
-			mockSetup: func(ctrl *gomock.Controller) ports.Logger {
+			mockSetup: func(ctrl *gomock.Controller) (ports.Logger, ports.FriendRepository) {
 				mockLogger := ports.NewMockLogger(ctrl)
+				mockRepo := ports.NewMockFriendRepository(ctrl)
 				mockLogger.EXPECT().Info("Add friend request received for user %s", "1")
-				return mockLogger
+				mockRepo.EXPECT().AddFriend(gomock.Any(), gomock.Any()).Return(&models.Friend{UserId: "1", FriendId: "2"}, nil)
+				return mockLogger, mockRepo
 			},
 			method: func(uc ports.FriendUseCase) (interface{}, error) {
 				return uc.AddFriend(context.Background(), &models.Friend{UserId: "1", FriendId: "2"})
@@ -34,10 +36,12 @@ func TestFriendUseCase_Success(t *testing.T) {
 		},
 		{
 			name: "GetFriends_Success",
-			mockSetup: func(ctrl *gomock.Controller) ports.Logger {
+			mockSetup: func(ctrl *gomock.Controller) (ports.Logger, ports.FriendRepository) {
 				mockLogger := ports.NewMockLogger(ctrl)
+				mockRepo := ports.NewMockFriendRepository(ctrl)
 				mockLogger.EXPECT().Info("Get friends request received for user %s", "1")
-				return mockLogger
+				mockRepo.EXPECT().GetFriends(gomock.Any(), "1").Return([]*models.Friend{{UserId: "1", FriendId: "2"}}, nil)
+				return mockLogger, mockRepo
 			},
 			method: func(uc ports.FriendUseCase) (interface{}, error) {
 				return uc.GetFriends(context.Background())
@@ -46,10 +50,13 @@ func TestFriendUseCase_Success(t *testing.T) {
 		},
 		{
 			name: "RespondToFriendRequest_Success",
-			mockSetup: func(ctrl *gomock.Controller) ports.Logger {
+			mockSetup: func(ctrl *gomock.Controller) (ports.Logger, ports.FriendRepository) {
 				mockLogger := ports.NewMockLogger(ctrl)
+				mockRepo := ports.NewMockFriendRepository(ctrl)
 				mockLogger.EXPECT().Info("Respond friend request received for user %s", "1")
-				return mockLogger
+				// TODO: Fix this
+				//mockRepo.EXPECT().RespondToFriendRequest(gomock.Any(), gomock.Any()).Return(&models.Friend{UserId: "1", FriendId: "2"}, nil)
+				return mockLogger, mockRepo
 			},
 			method: func(uc ports.FriendUseCase) (interface{}, error) {
 				return uc.RespondToFriendRequest(context.Background(), &models.Friend{UserId: "1", FriendId: "2"})
@@ -65,8 +72,8 @@ func TestFriendUseCase_Success(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			mockLogger := tt.mockSetup(ctrl)
-			uc := usecase.NewFriendUseCase(mockLogger)
+			mockLogger, mockRepo := tt.mockSetup(ctrl)
+			uc := usecase.NewFriendUseCase(mockLogger, mockRepo)
 			got, err := tt.method(uc)
 
 			assert.NoError(t, err)
@@ -135,7 +142,8 @@ func TestNewFriendUseCase(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockLogger := ports.NewMockLogger(ctrl)
-	uc := usecase.NewFriendUseCase(mockLogger)
+	mockRepo := ports.NewMockFriendRepository(ctrl)
+	uc := usecase.NewFriendUseCase(mockLogger, mockRepo)
 
 	assert.NotNil(t, uc)
 	assert.Implements(t, (*ports.FriendUseCase)(nil), uc)

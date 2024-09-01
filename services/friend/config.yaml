@@ -1,0 +1,12 @@
+server:
+  gateway_address: "0.0.0.0:8000"
+  grpc_address: "0.0.0.0:50000"
+  swagger_address: "localhost:8001"
+
+db:
+  connection_string: "postgres://user:password@localhost:5432/testdb?sslmode=disable"
+  max_connections: 10
+  min_connections: 2
+  max_conn_lifetime: "1h"
+  max_conn_idle_time: "30m"
+  health_check_period: "1m"

@@ -31,7 +31,7 @@ func NewHandler(useCases ports.UseCase, validator Validator) ports.HandlerFriend
 // @Accept json
 // @Produce json
 // @Param body body FriendRequest true "Friend request"
-// @Success 201 {string} string "Friend added"
+// @Success 201 {object} Friend "Friend"
 // @Failure 400 {string} string "Invalid request payload"
 // @Failure 400 {string} string "Validation failed"
 // @Failure 500 {string} string "Failed to add friend"
@@ -48,13 +48,17 @@ func (h *handler) PostAddFriend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := h.useCases.FriendUseCase().AddFriend(r.Context(), req.ConvertToModel())
+	user, err := h.useCases.FriendUseCase().AddFriend(r.Context(), req.ConvertToModel())
 	if err != nil {
 		http.Error(w, "Failed to add friend", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
+
+	if err = json.NewEncoder(w).Encode(user); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 }
 
 // GetFriends godoc

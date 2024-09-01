@@ -1,9 +1,8 @@
 package logger
 
 import (
+	"github.com/popeskul/awesome-messanger/services/platform/logger/ports"
 	"go.uber.org/zap"
-
-	"github.com/popeskul/awesome-messanger/services/auth/internal/core/ports"
 )
 
 type zapLogger struct {

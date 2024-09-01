@@ -19,6 +19,8 @@ RUN go build -o /app/friend-service ./cmd/server/main.go
 # Use a more feature-rich base image for debugging
 FROM alpine:latest
 
+COPY config.yaml /app/config.yaml
+
 # Copy the pre-built binary and swagger files
 COPY --from=builder /app/friend-service /app/friend-service
 COPY swagger /app/swagger
