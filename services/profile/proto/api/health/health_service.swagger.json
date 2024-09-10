@@ -16,98 +16,6 @@
     "application/json"
   ],
   "paths": {
-    "/health": {
-      "get": {
-        "summary": "Check performs a general health check.",
-        "operationId": "HealthService_Check2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/healthHealthCheckResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "tags": [
-          "HealthService"
-        ]
-      }
-    },
-    "/healthz": {
-      "get": {
-        "summary": "Healthz is a legacy endpoint for health checks.",
-        "operationId": "HealthService_Healthz2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/healthHealthCheckResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "tags": [
-          "HealthService"
-        ]
-      }
-    },
-    "/liveness": {
-      "get": {
-        "summary": "Liveness checks if the service is alive.",
-        "operationId": "HealthService_Liveness2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/healthHealthCheckResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "tags": [
-          "HealthService"
-        ]
-      }
-    },
-    "/readiness": {
-      "get": {
-        "summary": "Readiness checks if the service is ready to serve traffic.",
-        "operationId": "HealthService_Readiness2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/healthHealthCheckResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "tags": [
-          "HealthService"
-        ]
-      }
-    },
     "/v1/health": {
       "get": {
         "summary": "Check performs a general health check.",
@@ -206,11 +114,23 @@
       "type": "object",
       "properties": {
         "status": {
-          "type": "string",
+          "$ref": "#/definitions/healthHealthStatus",
           "description": "status is the health status of the service."
         }
       },
       "description": "HealthCheckResponse is the response message for health check RPCs."
+    },
+    "healthHealthStatus": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "HEALTHY",
+        "UNHEALTHY",
+        "ALIVE",
+        "READY"
+      ],
+      "default": "UNKNOWN",
+      "description": "HealthStatus is the status of the service."
     },
     "protobufAny": {
       "type": "object",

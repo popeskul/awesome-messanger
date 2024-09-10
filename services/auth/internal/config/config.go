@@ -10,18 +10,18 @@ type Config struct {
 }
 
 type Server struct {
-	HttpAddress    string
+	GatewayAddress string
 	GrpcAddress    string
 	SwaggerAddress string
 }
 
 func LoadConfig() (*Config, error) {
-	HttpAddress := os.Getenv("SERVER_HTTP_ADDRESS")
+	GatewayAddress := os.Getenv("SERVER_GATEWAY_ADDRESS")
 	GrpcAddress := os.Getenv("SERVER_GRPC_ADDRESS")
 	SwaggerAddress := os.Getenv("SERVER_SWAGGER_ADDRESS")
 
-	if HttpAddress == "" {
-		return nil, errors.New("SERVER_HTTP_ADDRESS is required")
+	if GatewayAddress == "" {
+		return nil, errors.New("SERVER_GATEWAY_ADDRESS is required")
 	}
 
 	if GrpcAddress == "" {
@@ -34,7 +34,7 @@ func LoadConfig() (*Config, error) {
 
 	return &Config{
 		Server: Server{
-			HttpAddress:    HttpAddress,
+			GatewayAddress: GatewayAddress,
 			GrpcAddress:    GrpcAddress,
 			SwaggerAddress: SwaggerAddress,
 		},

@@ -41,36 +41,38 @@ make deploy-canary
 Send a request to the service using the following command:
     
 ```sh
-grpcurl -d '{}' -plaintext localhost:50050 health.HealthService/Healthz
-curl http://localhost:8080/v1/health
-curl http://localhost:8080/v1/healthz
+http://localhost:8001/swagger/index.html
 
-grpcurl -d '{}' -plaintext localhost:50050 health.HealthService/Liveness
-curl http://localhost:8080/v1/healthz
+grpcurl -d '{}' -plaintext localhost:50000 health.HealthService/Healthz
+curl http://localhost:8000/v1/health
+curl http://localhost:8000/v1/healthz
 
-grpcurl -d '{}' -plaintext localhost:50050 health.HealthService/Check
-curl http://localhost:8080/v1/liveness
+grpcurl -d '{}' -plaintext localhost:50000 health.HealthService/Liveness
+curl http://localhost:8000/v1/healthz
 
-grpcurl -d '{}' -plaintext localhost:50050 health.HealthService/Readiness
-curl http://localhost:8080/v1/readiness
+grpcurl -d '{}' -plaintext localhost:50000 health.HealthService/Check
+curl http://localhost:8000/v1/liveness
 
-grpcurl -plaintext -d '{"username": "user123", "password": "password123"}' localhost:50050 auth.AuthService/Login
-curl -X POST http://localhost:8080/v1/login \
+grpcurl -d '{}' -plaintext localhost:50000 health.HealthService/Readiness
+curl http://localhost:8000/v1/readiness
+
+grpcurl -plaintext -d '{"username": "user123", "password": "password123"}' localhost:50000 auth.AuthService/Login
+curl -X POST http://localhost:8000/v1/login \
   -H "Content-Type: application/json" \
   -d '{"username": "user123", "password": "password123"}'
 
-grpcurl -plaintext -d '{"token": "your_token_here"}' localhost:50050 auth.AuthService/Logout
-curl -X POST http://localhost:8080/v1/login \
+grpcurl -plaintext -d '{"token": "your_token_here"}' localhost:50000 auth.AuthService/Logout
+curl -X POST http://localhost:8000/v1/login \
   -H "Content-Type: application/json" \
   -d '{"username": "user123", "password": "password123"}'
 
-grpcurl -plaintext -d '{"username": "newuser", "password": "newpassword"}' localhost:50050 auth.AuthService/Register
-curl -X POST http://localhost:8080/v1/register \
+grpcurl -plaintext -d '{"username": "newuser", "password": "newpassword"}' localhost:50000 auth.AuthService/Register
+curl -X POST http://localhost:8000/v1/register \
   -H "Content-Type: application/json" \
   -d '{"username": "newuser", "password": "newpassword"}'
 
-grpcurl -plaintext -d '{"old_token": "your_old_token_here"}' localhost:50050 auth.AuthService/Refresh
-curl -X POST http://localhost:8080/v1/register \
+grpcurl -plaintext -d '{"old_token": "your_old_token_here"}' localhost:50000 auth.AuthService/Refresh
+curl -X POST http://localhost:8000/v1/register \
   -H "Content-Type: application/json" \
   -d '{"username": "newuser", "password": "newpassword"}'
 ```

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package message;
+package notification;
 
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";

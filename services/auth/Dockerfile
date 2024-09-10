@@ -1,37 +1,35 @@
-# Start from the official Go image
+# Use an official Go runtime as a parent image for building
 FROM golang:1.22-alpine AS builder
 
-# Set the Current Working Directory inside the container
+# Set the working directory
 WORKDIR /app
 
 # Copy go mod and sum files
 COPY go.mod go.sum ./
 
-# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
+# Download all dependencies
 RUN go mod download
 
-# Copy the source code into the container
+# Copy source code
 COPY . .
 
 # Build the Go app
 RUN go build -o /app/auth-service ./cmd/server/main.go
 
-# Start a new stage from scratch
-FROM scratch
+# Use a more feature-rich base image for debugging
+FROM alpine:latest
 
-# Copy the Pre-built binary file from the previous stage
+# Copy the pre-built binary and swagger files
 COPY --from=builder /app/auth-service /app/auth-service
-
-# Copy the swagger directory
 COPY swagger /app/swagger
 
 # Set the working directory
 WORKDIR /app
 
-# Expose ports for gRPC and HTTP
-EXPOSE 50050
-EXPOSE 8080
-EXPOSE 8081
+# Expose ports
+EXPOSE 50000
+EXPOSE 8000
+EXPOSE 8001
 
 # Command to run the executable
 ENTRYPOINT ["/app/auth-service"]

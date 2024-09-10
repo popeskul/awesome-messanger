@@ -22,14 +22,14 @@ spec:
           image: friend-service:latest
           imagePullPolicy: Never
           ports:
-            - containerPort: 8090
-            - containerPort: 8091
+            - containerPort: 8010
+            - containerPort: 8011
           env:
-            - name: SERVER_HTTP_ADDRESS
+            - name: SERVER_GATEWAY_ADDRESS
               valueFrom:
                 configMapKeyRef:
                   name: friend-service-config
-                  key: SERVER_HTTP_ADDRESS
+                  key: SERVER_GATEWAY_ADDRESS
             - name: SERVER_SWAGGER_ADDRESS
               valueFrom:
                 configMapKeyRef:

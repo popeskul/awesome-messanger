@@ -20,16 +20,22 @@ spec:
         - name: notification-service
           image: notification-service:latest
           ports:
-            - containerPort: 50070
-            - containerPort: 9010
+            - containerPort: 50030
+            - containerPort: 8030
+            - containerPort: 8031
           env:
-            - name: SERVER_HTTP_ADDRESS
+            - name: SERVER_GATEWAY_ADDRESS
               valueFrom:
                 configMapKeyRef:
                   name: notification-service-config
-                  key: SERVER_HTTP_ADDRESS
+                  key: SERVER_GATEWAY_ADDRESS
             - name: SERVER_GRPC_ADDRESS
               valueFrom:
                 configMapKeyRef:
                   name: notification-service-config
                   key: SERVER_GRPC_ADDRESS
+            - name: SERVER_SWAGGER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: notification-service-config
+                  key: SERVER_SWAGGER_ADDRESS

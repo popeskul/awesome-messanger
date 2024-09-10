@@ -184,7 +184,7 @@ func RegisterProfileServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/message.ProfileService/CreateProfile", runtime.WithHTTPPathPattern("/v1/profiles"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/profile.ProfileService/CreateProfile", runtime.WithHTTPPathPattern("/v1/profiles"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -209,7 +209,7 @@ func RegisterProfileServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/message.ProfileService/UpdateProfile", runtime.WithHTTPPathPattern("/v1/profiles/{user_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/profile.ProfileService/UpdateProfile", runtime.WithHTTPPathPattern("/v1/profiles/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -234,7 +234,7 @@ func RegisterProfileServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/message.ProfileService/GetProfile", runtime.WithHTTPPathPattern("/v1/profiles/{user_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/profile.ProfileService/GetProfile", runtime.WithHTTPPathPattern("/v1/profiles/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -298,7 +298,7 @@ func RegisterProfileServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/message.ProfileService/CreateProfile", runtime.WithHTTPPathPattern("/v1/profiles"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/profile.ProfileService/CreateProfile", runtime.WithHTTPPathPattern("/v1/profiles"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -320,7 +320,7 @@ func RegisterProfileServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/message.ProfileService/UpdateProfile", runtime.WithHTTPPathPattern("/v1/profiles/{user_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/profile.ProfileService/UpdateProfile", runtime.WithHTTPPathPattern("/v1/profiles/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -342,7 +342,7 @@ func RegisterProfileServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/message.ProfileService/GetProfile", runtime.WithHTTPPathPattern("/v1/profiles/{user_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/profile.ProfileService/GetProfile", runtime.WithHTTPPathPattern("/v1/profiles/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

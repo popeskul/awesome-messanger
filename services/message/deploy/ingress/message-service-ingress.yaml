@@ -15,4 +15,4 @@ spec:
               service:
                 name: message-service
                 port:
-                  number: 9000
+                  number: 8020

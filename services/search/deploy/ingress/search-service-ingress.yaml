@@ -15,4 +15,4 @@ spec:
               service:
                 name: search-service
                 port:
-                  number: 9030
+                  number: 8050

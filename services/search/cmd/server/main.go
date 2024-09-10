@@ -17,11 +17,11 @@ func main() {
 	}
 
 	userService := service.NewUserService()
-	servicer := service.NewService(userService)
+	services := service.NewService(userService)
 
 	executableSchema := generated.NewExecutableSchema(
 		generated.Config{
-			Resolvers: resolver.NewResolver(servicer),
+			Resolvers: resolver.NewResolver(services),
 		},
 	)
 

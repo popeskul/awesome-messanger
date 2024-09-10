@@ -15,4 +15,4 @@ spec:
               service:
                 name: notification-service
                 port:
-                  number: 9010
+                  number: 8030

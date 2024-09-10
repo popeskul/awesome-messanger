@@ -98,7 +98,7 @@ port-forward:
 		exit 1; \
 	fi; \
 	echo "Port forwarding from local ports to pod $$POD_NAME"; \
-	kubectl port-forward pod/$$POD_NAME 9030:9030 &
+	kubectl port-forward pod/$$POD_NAME 8050:8050 &
 
 generate: .tidy
 

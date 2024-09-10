@@ -20,15 +20,15 @@ spec:
         - name: auth-service
           image: auth-service:latest
           ports:
-            - containerPort: 50050
-            - containerPort: 8080
-            - containerPort: 8081
+            - containerPort: 50000
+            - containerPort: 8000
+            - containerPort: 8001
           env:
-            - name: SERVER_HTTP_ADDRESS
+            - name: SERVER_GATEWAY_ADDRESS
               valueFrom:
                 configMapKeyRef:
                   name: auth-service-config
-                  key: SERVER_HTTP_ADDRESS
+                  key: SERVER_GATEWAY_ADDRESS
             - name: SERVER_GRPC_ADDRESS
               valueFrom:
                 configMapKeyRef:

@@ -23,8 +23,8 @@ FROM scratch
 COPY --from=builder /app/search-service /app/search-service
 
 # Expose ports for gRPC and HTTP
-EXPOSE 50090
-EXPOSE 9030
+EXPOSE 50050
+EXPOSE 8050
 
 # Command to run the executable
 ENTRYPOINT ["/app/search-service"]

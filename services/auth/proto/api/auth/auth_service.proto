@@ -81,6 +81,8 @@ message LoginRequest {
 message LoginResponse {
   // token is the token issued to the user upon successful login.
   string token = 1 [json_name = "token"];
+  // user is the user information.
+  User user = 2 [json_name = "user"];
 }
 
 // LogoutRequest is the request message for the Logout RPC.
@@ -94,10 +96,7 @@ message LogoutRequest {
 }
 
 // LogoutResponse is the response message for the Logout RPC.
-message LogoutResponse {
-  // message is a confirmation message indicating successful logout.
-  string message = 1 [json_name = "message"];
-}
+message LogoutResponse {}
 
 // RegisterRequest is the request message for the Register RPC.
 message RegisterRequest {
@@ -114,12 +113,22 @@ message RegisterRequest {
     (buf.validate.field).required = true,
     (google.api.field_behavior) = REQUIRED
   ];
+
+  // email is the email of the user to be registered.
+  string email = 3 [
+    json_name = "email",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
 }
 
 // RegisterResponse is the response message for the Register RPC.
 message RegisterResponse {
-  // message is a confirmation message indicating successful registration.
-  string message = 1 [json_name = "message"];
+  // token is the token issued to the user upon successful registration.
+  string token = 1 [json_name = "token"];
+
+  // user is the created user information.
+  User user = 2 [json_name = "user"];
 }
 
 // RefreshRequest is the request message for the Refresh RPC.
@@ -136,4 +145,16 @@ message RefreshRequest {
 message RefreshResponse {
   // new_token is the new token issued upon successful refresh.
   string new_token = 1 [json_name = "new_token"];
+}
+
+// User represents user information.
+message User {
+  // id is the unique identifier of the user.
+  string id = 1 [json_name = "id"];
+
+  // username is the username of the user.
+  string username = 2 [json_name = "username"];
+
+  // email is the email of the user.
+  string email = 3 [json_name = "email"];
 }

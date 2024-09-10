@@ -3,5 +3,6 @@ kind: ConfigMap
 metadata:
   name: message-service-config
 data:
-  SERVER_HTTP_ADDRESS: "0.0.0.0:9000"
-  SERVER_GRPC_ADDRESS: "0.0.0.0:50060"
+  SERVER_GRPC_ADDRESS: "0.0.0.0:50020"
+  SERVER_GATEWAY_ADDRESS: "0.0.0.0:8020"
+  SERVER_SWAGGER_ADDRESS: "0.0.0.0:8021"

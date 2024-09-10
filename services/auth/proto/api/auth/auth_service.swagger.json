@@ -1,0 +1,325 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "AuthService API",
+    "description": "This is the API for authentication services.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Auth gRPC-Gateway project"
+    }
+  },
+  "tags": [
+    {
+      "name": "AuthService"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/login": {
+      "post": {
+        "summary": "Login authenticates a user and returns a token.",
+        "operationId": "AuthService_Login",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authLoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "LoginRequest is the request message for the Login RPC.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authLoginRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/logout": {
+      "post": {
+        "summary": "Logout invalidates a user's token.",
+        "operationId": "AuthService_Logout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authLogoutResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "LogoutRequest is the request message for the Logout RPC.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authLogoutRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/refresh": {
+      "post": {
+        "summary": "Refresh issues a new token using an old token.",
+        "operationId": "AuthService_Refresh",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authRefreshResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "RefreshRequest is the request message for the Refresh RPC.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authRefreshRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/register": {
+      "post": {
+        "summary": "Register creates a new user account.",
+        "operationId": "AuthService_Register",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authRegisterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "RegisterRequest is the request message for the Register RPC.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authRegisterRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "authLoginRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "username is the username of the user trying to log in."
+        },
+        "password": {
+          "type": "string",
+          "description": "password is the password of the user trying to log in."
+        }
+      },
+      "description": "LoginRequest is the request message for the Login RPC.",
+      "required": [
+        "username",
+        "password"
+      ]
+    },
+    "authLoginResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "token is the token issued to the user upon successful login."
+        },
+        "user": {
+          "$ref": "#/definitions/authUser",
+          "description": "user is the user information."
+        }
+      },
+      "description": "LoginResponse is the response message for the Login RPC."
+    },
+    "authLogoutRequest": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "token is the token to be invalidated."
+        }
+      },
+      "description": "LogoutRequest is the request message for the Logout RPC.",
+      "required": [
+        "token"
+      ]
+    },
+    "authLogoutResponse": {
+      "type": "object",
+      "description": "LogoutResponse is the response message for the Logout RPC."
+    },
+    "authRefreshRequest": {
+      "type": "object",
+      "properties": {
+        "old_token": {
+          "type": "string",
+          "description": "old_token is the old token to be refreshed."
+        }
+      },
+      "description": "RefreshRequest is the request message for the Refresh RPC.",
+      "required": [
+        "old_token"
+      ]
+    },
+    "authRefreshResponse": {
+      "type": "object",
+      "properties": {
+        "new_token": {
+          "type": "string",
+          "description": "new_token is the new token issued upon successful refresh."
+        }
+      },
+      "description": "RefreshResponse is the response message for the Refresh RPC."
+    },
+    "authRegisterRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "username is the username of the user to be registered."
+        },
+        "password": {
+          "type": "string",
+          "description": "password is the password of the user to be registered."
+        },
+        "email": {
+          "type": "string",
+          "description": "email is the email of the user to be registered."
+        }
+      },
+      "description": "RegisterRequest is the request message for the Register RPC.",
+      "required": [
+        "username",
+        "password",
+        "email"
+      ]
+    },
+    "authRegisterResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "token is the token issued to the user upon successful registration."
+        },
+        "user": {
+          "$ref": "#/definitions/authUser",
+          "description": "user is the created user information."
+        }
+      },
+      "description": "RegisterResponse is the response message for the Register RPC."
+    },
+    "authUser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "id is the unique identifier of the user."
+        },
+        "username": {
+          "type": "string",
+          "description": "username is the username of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "email is the email of the user."
+        }
+      },
+      "description": "User represents user information."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about gRPC-Gateway",
+    "url": "https://github.com/grpc-ecosystem/grpc-gateway"
+  }
+}

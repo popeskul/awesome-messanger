@@ -1,5 +1,5 @@
 .PHONY: kube-deploy .build-image .kube-apply-configmap .kube-apply-namespace .kube-deploy-blue-green \
-		.kube-deploy-canary .kube-status .kube-logs .kube-service kube-clean port-forward generate
+		.kube-deploy-canary .kube-status .kube-logs .kube-service kube-clean port-forward generate swagger-generate
 
 IMAGE_NAME := friend-service
 IMAGE_TAG := latest
@@ -66,12 +66,26 @@ port-forward:
 		exit 1; \
 	fi; \
 	echo "Port forwarding from local ports to pod $$POD_NAME"; \
-	kubectl port-forward pod/$$POD_NAME 8090:8090 &
-	kubectl port-forward pod/$$POD_NAME 8091:8091 &
+	kubectl port-forward pod/$$POD_NAME 8010:8010 8011:8011 &
 
 generate:
 	go generate ./...
 
 
 swagger-generate:
-	swag init -g cmd/server/main.go -o ./swagger
+	@swag init -g cmd/server/main.go -o ./swagger
+
+	@mkdir -p swagger-ui
+
+	@curl -L -o swagger-ui/swagger-ui.zip https://github.com/swagger-api/swagger-ui/archive/refs/tags/v4.15.5.zip
+
+	@unzip -o swagger-ui/swagger-ui.zip -d swagger-ui
+
+	@cp -r swagger-ui/swagger-ui-4.15.5/dist/* swagger-ui/
+
+	@rm -rf swagger-ui/swagger-ui-4.15.5 swagger-ui/swagger-ui.zip
+
+	@cp ./swagger/swagger.json ./swagger-ui/swagger.json
+	@cp ./swagger/swagger.yaml ./swagger-ui/swagger.yaml
+
+	@rm -rf api

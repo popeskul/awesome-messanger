@@ -281,6 +281,10 @@
         "token": {
           "type": "string",
           "description": "token is the token issued to the user upon successful login."
+        },
+        "user": {
+          "$ref": "#/definitions/authUser",
+          "description": "user is the user information."
         }
       },
       "description": "LoginResponse is the response message for the Login RPC."
@@ -300,12 +304,6 @@
     },
     "authLogoutResponse": {
       "type": "object",
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "message is a confirmation message indicating successful logout."
-        }
-      },
       "description": "LogoutResponse is the response message for the Logout RPC."
     },
     "authRefreshRequest": {
@@ -341,33 +339,72 @@
         "password": {
           "type": "string",
           "description": "password is the password of the user to be registered."
+        },
+        "email": {
+          "type": "string",
+          "description": "email is the email of the user to be registered."
         }
       },
       "description": "RegisterRequest is the request message for the Register RPC.",
       "required": [
         "username",
-        "password"
+        "password",
+        "email"
       ]
     },
     "authRegisterResponse": {
       "type": "object",
       "properties": {
-        "message": {
+        "token": {
           "type": "string",
-          "description": "message is a confirmation message indicating successful registration."
+          "description": "token is the token issued to the user upon successful registration."
+        },
+        "user": {
+          "$ref": "#/definitions/authUser",
+          "description": "user is the created user information."
         }
       },
       "description": "RegisterResponse is the response message for the Register RPC."
+    },
+    "authUser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "id is the unique identifier of the user."
+        },
+        "username": {
+          "type": "string",
+          "description": "username is the username of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "email is the email of the user."
+        }
+      },
+      "description": "User represents user information."
     },
     "healthHealthCheckResponse": {
       "type": "object",
       "properties": {
         "status": {
-          "type": "string",
+          "$ref": "#/definitions/healthHealthStatus",
           "description": "status is the health status of the service."
         }
       },
       "description": "HealthCheckResponse is the response message for health check RPCs."
+    },
+    "healthHealthStatus": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "HEALTHY",
+        "UNHEALTHY",
+        "ALIVE",
+        "READY"
+      ],
+      "default": "UNKNOWN",
+      "description": "HealthStatus is the status of the service."
     },
     "protobufAny": {
       "type": "object",
@@ -401,5 +438,6 @@
   "externalDocs": {
     "description": "Find out more about gRPC-Gateway",
     "url": "https://github.com/grpc-ecosystem/grpc-gateway"
-  }
+  },
+  "securityDefinitions": null
 }
