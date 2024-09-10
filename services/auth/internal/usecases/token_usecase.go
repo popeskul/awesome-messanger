@@ -6,10 +6,10 @@ import (
 
 type TokenUseCase struct {
 	Logger ports.Logger
-	Token  ports.Token
+	Token  ports.TokenManager
 }
 
-func NewTokenUseCase(Logger ports.Logger, Token ports.Token) ports.TokenUseCase {
+func NewTokenUseCase(Logger ports.Logger, Token ports.TokenManager) ports.TokenUseCase {
 	return &TokenUseCase{
 		Logger: Logger,
 		Token:  Token,

@@ -13,11 +13,11 @@ type Validator interface {
 }
 
 type handler struct {
-	useCases  ports.UseCases
+	useCases  ports.UseCase
 	validator Validator
 }
 
-func NewHandler(useCases ports.UseCases, validator Validator) ports.HandlerFriends {
+func NewHandler(useCases ports.UseCase, validator Validator) ports.HandlerFriends {
 	return &handler{
 		useCases:  useCases,
 		validator: validator,
@@ -48,7 +48,7 @@ func (h *handler) PostAddFriend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := h.useCases.AddFriend(r.Context(), req.ConvertToModel())
+	_, err := h.useCases.FriendUseCase().AddFriend(r.Context(), req.ConvertToModel())
 	if err != nil {
 		http.Error(w, "Failed to add friend", http.StatusInternalServerError)
 		return
@@ -70,7 +70,7 @@ func (h *handler) PostAddFriend(w http.ResponseWriter, r *http.Request) {
 func (h *handler) GetFriends(w http.ResponseWriter, r *http.Request) {
 	userId := r.URL.Query().Get("userId")
 
-	friends, err := h.useCases.GetFriends(r.Context())
+	friends, err := h.useCases.FriendUseCase().GetFriends(r.Context())
 	if err != nil {
 		http.Error(w, "Failed to retrieve friends", http.StatusInternalServerError)
 		return
@@ -116,7 +116,7 @@ func (h *handler) PostRespondFriendRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	_, err := h.useCases.RespondToFriendRequest(r.Context(), req.ConvertToModel())
+	_, err := h.useCases.FriendUseCase().RespondToFriendRequest(r.Context(), req.ConvertToModel())
 	if err != nil {
 		http.Error(w, "Failed to respond to friend request", http.StatusInternalServerError)
 		return

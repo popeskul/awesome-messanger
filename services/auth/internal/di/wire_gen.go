@@ -33,8 +33,8 @@ func InitializeApp() (*app.App, error) {
 	}
 	portsLogger := logger.NewZapLogger(zapLogger)
 	authUseCase := usecases.NewAuthUseCase(portsLogger)
-	portsToken := token.NewTokenService()
-	tokenUseCase := usecases.NewTokenUseCase(portsLogger, portsToken)
+	tokenManager := token.NewTokenService()
+	tokenUseCase := usecases.NewTokenUseCase(portsLogger, tokenManager)
 	v := validator.ProvideProtoMessages()
 	portsValidator, err := validator.NewGrpcValidator(v...)
 	if err != nil {

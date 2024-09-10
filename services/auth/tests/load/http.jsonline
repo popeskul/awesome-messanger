@@ -1,0 +1,5 @@
+{
+  "uri": "/v1/healthz",
+  "method": "GET",
+  "host": "localhost"
+}

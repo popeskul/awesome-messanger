@@ -49,9 +49,9 @@ func testSendMessage(client message.MessageServiceClient) {
 	defer cancel()
 
 	req := &message.SendMessageRequest{
-		SenderId:    "user1",
-		RecipientId: "user2",
-		Content:     "Hello there!",
+		SenderId: "user1",
+		ChatId:   "chat1",
+		Content:  "Hello, World!",
 	}
 
 	resp, err := client.SendMessage(ctx, req)
@@ -59,9 +59,9 @@ func testSendMessage(client message.MessageServiceClient) {
 		log.Fatalf("could not send message: %v", err)
 	}
 
-	if resp.GetSuccess() {
-		log.Println("Message sent successfully!")
+	if resp.String() == "OK" {
+		log.Printf("Message sent successfully")
 	} else {
-		log.Println("Failed to send message.")
+		log.Printf("Failed to send message")
 	}
 }

@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MessageService_GetMessages_FullMethodName = "/message.MessageService/GetMessages"
-	MessageService_SendMessage_FullMethodName = "/message.MessageService/SendMessage"
+	MessageService_GetMessages_FullMethodName    = "/message.MessageService/GetMessages"
+	MessageService_SendMessage_FullMethodName    = "/message.MessageService/SendMessage"
+	MessageService_StreamMessages_FullMethodName = "/message.MessageService/StreamMessages"
 )
 
 // MessageServiceClient is the client API for MessageService service.
@@ -33,6 +34,8 @@ type MessageServiceClient interface {
 	GetMessages(ctx context.Context, in *GetMessagesRequest, opts ...grpc.CallOption) (*GetMessagesResponse, error)
 	// SendMessage sends a new message.
 	SendMessage(ctx context.Context, in *SendMessageRequest, opts ...grpc.CallOption) (*SendMessageResponse, error)
+	// StreamMessages allows streaming of messages for real-time updates.
+	StreamMessages(ctx context.Context, in *StreamMessagesRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Message], error)
 }
 
 type messageServiceClient struct {
@@ -63,6 +66,25 @@ func (c *messageServiceClient) SendMessage(ctx context.Context, in *SendMessageR
 	return out, nil
 }
 
+func (c *messageServiceClient) StreamMessages(ctx context.Context, in *StreamMessagesRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Message], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &MessageService_ServiceDesc.Streams[0], MessageService_StreamMessages_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[StreamMessagesRequest, Message]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MessageService_StreamMessagesClient = grpc.ServerStreamingClient[Message]
+
 // MessageServiceServer is the server API for MessageService service.
 // All implementations must embed UnimplementedMessageServiceServer
 // for forward compatibility.
@@ -73,6 +95,8 @@ type MessageServiceServer interface {
 	GetMessages(context.Context, *GetMessagesRequest) (*GetMessagesResponse, error)
 	// SendMessage sends a new message.
 	SendMessage(context.Context, *SendMessageRequest) (*SendMessageResponse, error)
+	// StreamMessages allows streaming of messages for real-time updates.
+	StreamMessages(*StreamMessagesRequest, grpc.ServerStreamingServer[Message]) error
 	mustEmbedUnimplementedMessageServiceServer()
 }
 
@@ -88,6 +112,9 @@ func (UnimplementedMessageServiceServer) GetMessages(context.Context, *GetMessag
 }
 func (UnimplementedMessageServiceServer) SendMessage(context.Context, *SendMessageRequest) (*SendMessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
+}
+func (UnimplementedMessageServiceServer) StreamMessages(*StreamMessagesRequest, grpc.ServerStreamingServer[Message]) error {
+	return status.Errorf(codes.Unimplemented, "method StreamMessages not implemented")
 }
 func (UnimplementedMessageServiceServer) mustEmbedUnimplementedMessageServiceServer() {}
 func (UnimplementedMessageServiceServer) testEmbeddedByValue()                        {}
@@ -146,6 +173,17 @@ func _MessageService_SendMessage_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MessageService_StreamMessages_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(StreamMessagesRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(MessageServiceServer).StreamMessages(m, &grpc.GenericServerStream[StreamMessagesRequest, Message]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MessageService_StreamMessagesServer = grpc.ServerStreamingServer[Message]
+
 // MessageService_ServiceDesc is the grpc.ServiceDesc for MessageService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -162,6 +200,12 @@ var MessageService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _MessageService_SendMessage_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamMessages",
+			Handler:       _MessageService_StreamMessages_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "api/message/message_service.proto",
 }

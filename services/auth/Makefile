@@ -3,7 +3,8 @@
         .vendor-google-protobuf .vendor-googleapis .vendor-protovalidate .vendor-tidy port-forward \
         generate .protoc-generate .bin-deps .tidy .kube-apply-ingress .kube-deploy-ingress-controller \
         lint .proto-lint .buf-generate proto-format .vendor-protoc-gen-openapiv2 kube-deploy \
-        .protoc-generate swagger-generate .buf-generate proto-format wire
+        .protoc-generate swagger-generate .buf-generate proto-format wire gogenerate test \
+        test-coverage
 
 IMAGE_NAME := auth-service
 IMAGE_TAG := latest
@@ -148,7 +149,7 @@ port-forward:
 SWAGGER_UI_VERSION := 4.15.5
 SWAGGER_UI_URL := https://github.com/swagger-api/swagger-ui/archive/v$(SWAGGER_UI_VERSION).tar.gz
 
-generate: .bin-deps .buf-generate proto-format .tidy wire swagger-generate
+generate: .bin-deps .buf-generate proto-format .tidy wire swagger-generate gogenerate
 
 .protoc-generate:
 	mkdir -p $(PKG_PROTO_PATH) api
@@ -209,3 +210,32 @@ lint: .proto-lint
 
 wire:
 	wire ./internal/di/wire.go
+
+gogenerate:
+	go generate ./...
+
+test:
+	go test ./...
+
+test-coverage:
+	go test -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report generated: coverage.html"
+
+PANDORA_VERSION := 0.5.31
+PANDORA_URL := https://github.com/yandex/pandora/releases/download/v$(PANDORA_VERSION)/pandora_$(PANDORA_VERSION)_darwin_arm64
+PANDORA_BIN := bin/pandora
+
+install-pandora:
+	@echo "Installing pandora..."
+	@if [ ! -f "$(PANDORA_BIN)" ]; then \
+		curl -L -o $(PANDORA_BIN) $(PANDORA_URL) && \
+		chmod +x $(PANDORA_BIN); \
+	else \
+		echo "Pandora is already installed."; \
+	fi
+
+load-test: install-pandora
+	@echo "Running load test..."
+	@$(PANDORA_BIN) ./tests/load/pandora_config.yaml
+	@echo "Load test complete."

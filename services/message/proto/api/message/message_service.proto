@@ -5,6 +5,7 @@ package message;
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/popeskul/awesome-messanger/services/message/pkg/api/message;message";
 
@@ -12,10 +13,7 @@ option go_package = "github.com/popeskul/awesome-messanger/services/message/pkg/
 service MessageService {
   // GetMessages retrieves messages from a chat.
   rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse) {
-    option (google.api.http) = {
-      get: "/v1/messages/{chat_id}"
-      // Removed the body field for GET method
-    };
+    option (google.api.http) = {get: "/v1/messages/{chat_id}"};
   }
 
   // SendMessage sends a new message.
@@ -25,6 +23,9 @@ service MessageService {
       body: "*"
     };
   }
+
+  // StreamMessages allows streaming of messages for real-time updates.
+  rpc StreamMessages(StreamMessagesRequest) returns (stream Message) {}
 }
 
 // GetMessagesRequest is the request message for the GetMessages RPC.
@@ -35,26 +36,39 @@ message GetMessagesRequest {
     (buf.validate.field).required = true,
     (google.api.field_behavior) = REQUIRED
   ];
+
+  // limit is the maximum number of messages to retrieve.
+  int32 limit = 2 [
+    json_name = "limit",
+    (buf.validate.field).int32.gte = 1,
+    (buf.validate.field).int32.lte = 100
+  ];
+
+  // before_timestamp allows fetching messages before a certain time.
+  google.protobuf.Timestamp before_timestamp = 3 [json_name = "before_timestamp"];
 }
 
 // GetMessagesResponse is the response message for the GetMessages RPC.
 message GetMessagesResponse {
   // messages is a list of messages from the chat.
   repeated Message messages = 1 [json_name = "messages"];
+
+  // has_more indicates if there are more messages to fetch.
+  bool has_more = 2 [json_name = "has_more"];
 }
 
 // SendMessageRequest is the request message for the SendMessage RPC.
 message SendMessageRequest {
-  // sender_id is the ID of the message sender.
-  string sender_id = 1 [
-    json_name = "sender_id",
+  // chat_id is the ID of the chat to send the message to.
+  string chat_id = 1 [
+    json_name = "chat_id",
     (buf.validate.field).required = true,
     (google.api.field_behavior) = REQUIRED
   ];
 
-  // recipient_id is the ID of the message recipient.
-  string recipient_id = 2 [
-    json_name = "recipient_id",
+  // sender_id is the ID of the message sender.
+  string sender_id = 2 [
+    json_name = "sender_id",
     (buf.validate.field).required = true,
     (google.api.field_behavior) = REQUIRED
   ];
@@ -69,18 +83,34 @@ message SendMessageRequest {
 
 // SendMessageResponse is the response message for the SendMessage RPC.
 message SendMessageResponse {
-  // success indicates whether the message was sent successfully.
-  bool success = 1 [json_name = "success"];
+  // message is the sent message with server-assigned fields (like timestamp).
+  Message message = 1 [json_name = "message"];
+}
+
+// StreamMessagesRequest is the request message for the StreamMessages RPC.
+message StreamMessagesRequest {
+  // chat_id is the ID of the chat to stream messages from.
+  string chat_id = 1 [
+    json_name = "chat_id",
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
 }
 
 // Message represents a single message in a chat.
 message Message {
+  // id is the unique identifier for the message.
+  string id = 1 [json_name = "id"];
+
+  // chat_id is the ID of the chat this message belongs to.
+  string chat_id = 2 [json_name = "chat_id"];
+
   // sender_id is the ID of the sender of the message.
-  string sender_id = 1 [json_name = "sender_id"];
+  string sender_id = 3 [json_name = "sender_id"];
 
   // content is the content of the message.
-  string content = 2 [json_name = "content"];
+  string content = 4 [json_name = "content"];
 
   // timestamp is the time when the message was sent.
-  int64 timestamp = 3 [json_name = "timestamp"];
+  google.protobuf.Timestamp timestamp = 5 [json_name = "timestamp"];
 }

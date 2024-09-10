@@ -167,6 +167,22 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "limit is the maximum number of messages to retrieve.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "before_timestamp",
+            "description": "before_timestamp allows fetching messages before a certain time.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
           }
         ],
         "tags": [
@@ -236,6 +252,10 @@
             "$ref": "#/definitions/messageMessage"
           },
           "description": "messages is a list of messages from the chat."
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "has_more indicates if there are more messages to fetch."
         }
       },
       "description": "GetMessagesResponse is the response message for the GetMessages RPC."
@@ -243,6 +263,14 @@
     "messageMessage": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "id is the unique identifier for the message."
+        },
+        "chat_id": {
+          "type": "string",
+          "description": "chat_id is the ID of the chat this message belongs to."
+        },
         "sender_id": {
           "type": "string",
           "description": "sender_id is the ID of the sender of the message."
@@ -253,7 +281,7 @@
         },
         "timestamp": {
           "type": "string",
-          "format": "int64",
+          "format": "date-time",
           "description": "timestamp is the time when the message was sent."
         }
       },
@@ -262,13 +290,13 @@
     "messageSendMessageRequest": {
       "type": "object",
       "properties": {
+        "chat_id": {
+          "type": "string",
+          "description": "chat_id is the ID of the chat to send the message to."
+        },
         "sender_id": {
           "type": "string",
           "description": "sender_id is the ID of the message sender."
-        },
-        "recipient_id": {
-          "type": "string",
-          "description": "recipient_id is the ID of the message recipient."
         },
         "content": {
           "type": "string",
@@ -277,17 +305,17 @@
       },
       "description": "SendMessageRequest is the request message for the SendMessage RPC.",
       "required": [
+        "chat_id",
         "sender_id",
-        "recipient_id",
         "content"
       ]
     },
     "messageSendMessageResponse": {
       "type": "object",
       "properties": {
-        "success": {
-          "type": "boolean",
-          "description": "success indicates whether the message was sent successfully."
+        "message": {
+          "$ref": "#/definitions/messageMessage",
+          "description": "message is the sent message with server-assigned fields (like timestamp)."
         }
       },
       "description": "SendMessageResponse is the response message for the SendMessage RPC."

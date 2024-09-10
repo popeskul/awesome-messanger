@@ -1,4 +1,4 @@
-package usecases
+package usecase
 
 import (
 	"context"
@@ -7,22 +7,22 @@ import (
 	"github.com/popeskul/awesome-messanger/services/friend/internal/core/ports"
 )
 
-type useCases struct {
+type friendUseCase struct {
 	logger ports.Logger
 }
 
-func NewUseCases(logger ports.Logger) ports.UseCases {
-	return &useCases{
+func NewFriendUseCase(logger ports.Logger) ports.FriendUseCase {
+	return &friendUseCase{
 		logger: logger,
 	}
 }
 
-func (s *useCases) AddFriend(ctx context.Context, inout *models.Friend) (*models.Friend, error) {
+func (s *friendUseCase) AddFriend(ctx context.Context, inout *models.Friend) (*models.Friend, error) {
 	s.logger.Info("Add friend request received for user %s", inout.UserId)
 	return inout, nil
 }
 
-func (s *useCases) GetFriends(ctx context.Context) ([]*models.Friend, error) {
+func (s *friendUseCase) GetFriends(ctx context.Context) ([]*models.Friend, error) {
 	s.logger.Info("Get friends request received for user %s", "1")
 	return []*models.Friend{
 		{
@@ -32,7 +32,7 @@ func (s *useCases) GetFriends(ctx context.Context) ([]*models.Friend, error) {
 	}, nil
 }
 
-func (s *useCases) RespondToFriendRequest(ctx context.Context, inout *models.Friend) (*models.Friend, error) {
+func (s *friendUseCase) RespondToFriendRequest(ctx context.Context, inout *models.Friend) (*models.Friend, error) {
 	s.logger.Info("Respond friend request received for user %s", inout.UserId)
 	return inout, nil
 }
