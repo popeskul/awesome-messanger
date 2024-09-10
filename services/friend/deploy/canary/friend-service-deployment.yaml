@@ -33,3 +33,33 @@ spec:
                 configMapKeyRef:
                   name: friend-service-config
                   key: SERVER_SWAGGER_ADDRESS
+            - name: DB_CONNECTION_STRING
+              valueFrom:
+                configMapKeyRef:
+                  name: friend-service-config
+                  key: DB_CONNECTION_STRING
+            - name: DB_MAX_CONNECTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: friend-service-config
+                  key: DB_MAX_CONNECTIONS
+            - name: DB_MIN_CONNECTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: friend-service-config
+                  key: DB_MIN_CONNECTIONS
+            - name: DB_MAX_CONN_LIFETIME
+              valueFrom:
+                configMapKeyRef:
+                  name: friend-service-config
+                  key: DB_MAX_CONN_LIFETIME
+            - name: DB_MAX_CONN_IDLE_TIME
+              valueFrom:
+                configMapKeyRef:
+                  name: friend-service-config
+                  key: DB_MAX_CONN_IDLE_TIME
+            - name: DB_HEALTH_CHECK_PERIOD
+              valueFrom:
+                configMapKeyRef:
+                  name: friend-service-config
+                  key: DB_HEALTH_CHECK_PERIOD

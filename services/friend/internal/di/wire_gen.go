@@ -7,20 +7,26 @@
 package di
 
 import (
+	"context"
 	"github.com/go-playground/validator/v10"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/adapters/http/server"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/adapters/logger"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/app"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/config"
+	ports2 "github.com/popeskul/awesome-messanger/services/friend/internal/core/ports"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/delivery/http"
+	"github.com/popeskul/awesome-messanger/services/friend/internal/repository"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/swagger"
 	"github.com/popeskul/awesome-messanger/services/friend/internal/usecase"
+	config2 "github.com/popeskul/awesome-messanger/services/platform/database/postgres/config"
+	"github.com/popeskul/awesome-messanger/services/platform/database/postgres/connection"
+	"github.com/popeskul/awesome-messanger/services/platform/database/postgres/ports"
 	"go.uber.org/zap"
 )
 
 // Injectors from wire.go:
 
-func InitializeApp() (*app.App, error) {
+func InitializeApp(ctx context.Context) (*app.App, error) {
 	configConfig, err := config.LoadConfig()
 	if err != nil {
 		return nil, err
@@ -30,7 +36,12 @@ func InitializeApp() (*app.App, error) {
 		return nil, err
 	}
 	loggerZapLogger := logger.NewZapLogger(zapLogger)
-	friendUseCase := usecase.NewFriendUseCase(loggerZapLogger)
+	connection, err := provideConnection(ctx, configConfig)
+	if err != nil {
+		return nil, err
+	}
+	friendRepository := provideFriendRepository(connection)
+	friendUseCase := usecase.NewFriendUseCase(loggerZapLogger, friendRepository)
 	useCase := usecase.NewUseCase(friendUseCase)
 	validate := validator.New()
 	handlerFriends := http.NewHandler(useCase, validate)
@@ -44,4 +55,21 @@ func InitializeApp() (*app.App, error) {
 
 func provideZapLogger() (*zap.Logger, error) {
 	return zap.NewProduction()
+}
+
+func provideFriendRepository(conn ports.Connection) ports2.FriendRepository {
+	repos := repository.NewRepositories(conn)
+	return repos.Friend()
+}
+
+func provideConnection(ctx context.Context, cfg *config.Config) (ports.Connection, error) {
+	platformCfg := &config2.Config{
+		ConnectionString:  cfg.Database.ConnectionString,
+		MaxConnections:    cfg.Database.MaxConnections,
+		MinConnections:    cfg.Database.MinConnections,
+		MaxConnLifetime:   cfg.Database.MaxConnLifetime,
+		MaxConnIdleTime:   cfg.Database.MaxConnIdleTime,
+		HealthCheckPeriod: cfg.Database.HealthCheckPeriod,
+	}
+	return connection.New(ctx, platformCfg)
 }

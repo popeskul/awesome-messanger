@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-config
+data:
+  SERVER_GRPC_ADDRESS: "0.0.0.0:50000"
+  SERVER_GATEWAY_ADDRESS: "0.0.0.0:8000"
+  SERVER_SWAGGER_ADDRESS: "0.0.0.0:8001"
+  DB_CONNECTION_STRING: "postgres://user:password@postgres:5432/frienddb?sslmode=disable"
+  DB_MAX_CONNECTIONS: "10"
+  DB_MIN_CONNECTIONS: "2"
+  DB_MAX_CONN_LIFETIME: "1h"
+  DB_MAX_CONN_IDLE_TIME: "30m"
+  DB_HEALTH_CHECK_PERIOD: "1m"
